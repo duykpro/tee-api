@@ -1,29 +1,30 @@
 type BaseRetailProduct = {
   id: string;
   name: string;
-  sku: string;
-  price: number;
-  regularPrice: number;
-  salePrice: number;
-  isVirtual: boolean;
-  weight: number;
-  dimensions: {
+  sku?: string;
+  price?: number;
+  regularPrice?: number;
+  salePrice?: number;
+  isVirtual?: boolean;
+  weight?: number;
+  dimensions?: {
     length: number;
     width: number;
     height: number;
   };
-  images: RetailProductImage[];
+  images?: RetailProductImage[];
   createdAt: Date;
   updatedAt: Date;
 }
 
 export type RetailProduct = BaseRetailProduct & {
-  description: string;
-  type: RetailProductType;
-  status: RetailProductStatus;
-  variants: RetailProductVariant[];
-  attributes: RetailProductAttribute[];
-  featuredImage: RetailProductImage;
+  description?: string;
+  type?: RetailProductType;
+  status?: RetailProductStatus;
+  linkedProducts?: RetailProduct[];
+  variants?: RetailProductVariant[];
+  attributes?: RetailProductAttribute[];
+  featuredImage?: RetailProductImage;
 }
 
 export enum RetailProductType {
@@ -41,20 +42,23 @@ export interface RetailProductVariant extends BaseRetailProduct {
 export interface RetailProductAttribute {
   id: string;
   name: string;
-  position: number;
+  type: string;
   default: string;
-  options: string[];
+  options: {
+    cost?: number;
+    label?: string;
+    value?: string;
+  }[];
 }
 
 export interface RetailProductVariantAttribute {
   id: string;
-  name: string;
-  option: string;
+  value: string;
 }
 
 export interface RetailProductImage {
   id: string;
   src: string;
   position: number;
-  variantIds: string[];
+  variantIds?: string[];
 }

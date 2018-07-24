@@ -12,14 +12,18 @@ export class CampaignController {
     @inject(type.CampaignRepository) private campaign: CampaignRepository
   ) { }
 
-  public async index(req: Request, res: Response): Promise<void> {
-    const campaigns: Campaign[] = await this.campaign.list();
-    const response: ListItemResponse = {
-      id: 'campaigns',
-      data: campaigns
-    };
+  public async index(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const campaigns: Campaign[] = await this.campaign.list();
+      const response: ListItemResponse = {
+        id: 'campaigns',
+        data: campaigns
+      };
 
-    res.status(200).send(response);
+      res.status(200).send(response);
+    } catch (e) {
+      next(e);
+    }
   }
 
   public async show(req: Request, res: Response, next: NextFunction): Promise<void> {

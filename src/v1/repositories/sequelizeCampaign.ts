@@ -1,5 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { Op } from 'sequelize';
+import { pick } from 'lodash';
 import { type } from '../constants/serviceIdentifier';
 import { Campaign, RetailProduct } from '../models';
 import { CampaignRepository } from './campaign';
@@ -8,7 +9,6 @@ import camelCase from 'camelcase';
 import {
   Campaign as SequelizeCampaign,
   CampaignInstance,
-  CampaignRetailProduct,
   RetailProduct as SequelizeRetailProduct
 } from '../storage/sequelize/models';
 
@@ -19,49 +19,27 @@ export class SequelizeCampaignRepository implements CampaignRepository {
   ) { }
 
   public async list(): Promise<Campaign[]> {
-    const campaigns = await SequelizeCampaign.findAll().map((campaign: any) => {
-      return this.instanceToModel(campaign);
-    })
-
-    return campaigns;
+    return await SequelizeCampaign.findAll().map(async instance => {
+      return this.instanceToModel(instance);
+    });
   }
 
   public async findById(id: string): Promise<Campaign> {
-    let campaign = this.instanceToModel(await SequelizeCampaign.findById(id));
-    campaign = await this.getAssociated(campaign);
-
-    return campaign;
+    return this.instanceToModel(await SequelizeCampaign.findById(id));
   }
 
-  private instanceToModel(source: CampaignInstance): Campaign {
-    let campaign = <Campaign>{};
-
-    Object.keys(source.get()).forEach(key => {
-      campaign[camelCase(key)] = source[key];
-    });
+  private async instanceToModel(instance: CampaignInstance): Promise<Campaign> {
+    const campaign: Campaign = {
+      id: instance.id.toString(),
+      title: instance.title,
+      description: instance.description,
+      slug: instance.slug,
+      duration: instance.metadata.duration,
+      retailProduct: await this.retailProduct.findById(''+instance.metadata.retail_product_id),
+      createdAt: instance.created_at,
+      updatedAt: instance.updated_at
+    };
 
     return campaign;
-  }
-
-  private async getAssociated(campaign: Campaign): Promise<Campaign> {
-    campaign.retailProducts = await this.getAssociatedRetailProducts(campaign);
-
-    return campaign;
-  }
-
-  private async getAssociatedRetailProducts(campaign: Campaign): Promise<RetailProduct[]> {
-    const campaignRetailProducts = await CampaignRetailProduct.findAll({
-      where: {
-        campaignId: campaign.id
-      }
-    });
-    const retailProductIds = campaignRetailProducts.map((product: any) => product.retailProductId);
-    const retailProducts = await this.retailProduct.list({
-      filter: {
-        ids: retailProductIds
-      }
-    });
-
-    return retailProducts as RetailProduct[];
   }
 }

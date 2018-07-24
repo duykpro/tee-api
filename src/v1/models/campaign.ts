@@ -1,10 +1,12 @@
 import { RetailProduct } from "./retailProduct";
 
-export interface Campaign {
-  id?: string;
-  title?: string;
-  description?: string;
-  retailProducts?: RetailProduct[];
-  createdAt?: Date;
-  updatedAt?: Date;
+export type Campaign = {
+  id: string;
+  title: string;
+  description: string;
+  slug: string;
+  duration: Number;
+  retailProduct: RetailProduct;
+  createdAt: Date;
+  updatedAt: Date;
 }

@@ -6,11 +6,50 @@ export interface RetailProductAttributes {
   id: number;
   parentId: number | null;
   name: string;
-  metadata: Object;
-  attrs: Object;
+  metadata: {
+    sku?: string;
+    linked_product_ids?: number[];
+    images?: {
+      id: number;
+      featured?: boolean;
+    }[];
+  };
+  attrs: {
+    id: string;
+    name: string;
+    type: string;
+    default: string;
+    options: {
+      cost?: number;
+      label?: string;
+      value?: string;
+    }[];
+  }[] | {
+    id: string;
+    value: string;
+  }[];
+  type: number;
+  status: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface RetailProductMediaAttributes {
+  id: number;
+  path: string;
+  metadata: {
+    size?: number;
+    minetype?: string;
+  };
+  uploadedBy: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface RetailProductInstance extends Sequelize.Instance<RetailProductAttributes>, RetailProductAttributes {
+}
+
+export interface RetailProductMediaInstance extends Sequelize.Instance<RetailProductMediaAttributes>, RetailProductMediaAttributes {
 }
 
 export const RetailProductAttribute = storeDB.define('retailProductAttribute', {
@@ -81,6 +120,12 @@ export const RetailProduct = storeDB.define<RetailProductInstance, RetailProduct
   attrs: {
     type: Sequelize.JSON,
     field: 'attributes'
+  },
+  type: {
+    type: Sequelize.TINYINT
+  },
+  status: {
+    type: Sequelize.TINYINT
   }
 }, {
   tableName: 'products',
@@ -88,19 +133,13 @@ export const RetailProduct = storeDB.define<RetailProductInstance, RetailProduct
   updatedAt: 'updated_at'
 });
 
-export const RetailProductMedia = storeDB.define('retailProductMedia', {
+export const RetailProductMedia = storeDB.define<RetailProductMediaInstance, RetailProductMediaAttributes>('retailProductMedia', {
   id: {
     type: Sequelize.BIGINT,
     autoIncrement: true,
     primaryKey: true
   },
   path: {
-    type: Sequelize.STRING
-  },
-  minetype: {
-    type: Sequelize.STRING
-  },
-  size: {
     type: Sequelize.STRING
   },
   uploadedBy: {
@@ -112,24 +151,3 @@ export const RetailProductMedia = storeDB.define('retailProductMedia', {
   createdAt: 'uploaded_at',
   updatedAt: 'updated_at'
 });
-
-export const RetailProductProductAttributeValue = storeDB.define('retailProductProductAttributeValue', {
-}, {
-  timestamps: false,
-  tableName: 'product_attribute_value'
-});
-
-// RetailProductAttributeValue.belongsTo(RetailProductAttribute, { foreignKey: 'attribute_id' });
-// RetailProductAttribute.hasMany(RetailProductAttributeValue, { foreignKey: 'attribute_id' });
-// RetailProduct.belongsToMany(RetailProductAttributeValue, {
-//   as: 'Attributes',
-//   through: RetailProductProductAttributeValue,
-//   foreignKey: 'product_id',
-//   otherKey: 'attribute_value_id'
-// });
-// RetailProductAttributeValue.belongsToMany(RetailProduct, {
-//   as: 'Products',
-//   through: RetailProductProductAttributeValue,
-//   foreignKey: 'attribute_value_id',
-//   otherKey: 'product_id'
-// });
