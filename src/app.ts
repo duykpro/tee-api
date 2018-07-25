@@ -17,13 +17,7 @@ app.set('port', process.env.PORT || 1995);
 
 const whitelist = (process.env.WHITE_LIST_ORIGINS || '').split(' ');
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
+  origin: whitelist
 };
 
 app.use(cors(corsOptions));

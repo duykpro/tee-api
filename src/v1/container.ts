@@ -1,16 +1,28 @@
 import { Container } from 'inversify';
 import { type } from './constants/serviceIdentifier';
 import {
+  ArtworkRepository,
+  ProductColorRepository,
+  ProductMockupRepository,
   CampaignRepository,
-  SequelizeCampaignRepository,
+  DesignLineRepository,
   CartRepository,
-  SequelizeCartRepository,
   RetailProductRepository,
-  SequelizeRetailProductRepository,
+  SequelizeArtworkRepository,
+  SequelizeProductColorRepository,
+  SequelizeProductMockupRepository,
+  SequelizeCampaignRepository,
+  SequelizeDesignLineRepository,
+  SequelizeCartRepository,
+  SequelizeRetailProductRepository
 } from './repositories';
 
 let container = new Container();
+container.bind<ArtworkRepository>(type.ArtworkRepository).to(SequelizeArtworkRepository);
+container.bind<ProductColorRepository>(type.ProductColorRepository).to(SequelizeProductColorRepository);
+container.bind<ProductMockupRepository>(type.ProductMockupRepository).to(SequelizeProductMockupRepository);
 container.bind<CampaignRepository>(type.CampaignRepository).to(SequelizeCampaignRepository);
+container.bind<DesignLineRepository>(type.DesignLineRepository).to(SequelizeDesignLineRepository);
 container.bind<CartRepository>(type.CartRepository).to(SequelizeCartRepository);
 container.bind<RetailProductRepository>(type.RetailProductRepository).to(SequelizeRetailProductRepository);
 

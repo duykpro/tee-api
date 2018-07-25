@@ -2,11 +2,11 @@ import express, { Request, Response } from 'express';
 import container from './container';
 import { CampaignController, CartController, RetailProductController, ProductMockupController } from './controllers';
 import { APIError } from './error';
-import { NextFunction } from '../../node_modules/@types/express-serve-static-core';
+import { NextFunction } from 'express-serve-static-core';
 
 const api = express.Router({ mergeParams: true });
-const campaignController: CampaignController = container.resolve<CampaignController>(CampaignController);
 const productMockupController: ProductMockupController = container.resolve<ProductMockupController>(ProductMockupController);
+const campaignController: CampaignController = container.resolve<CampaignController>(CampaignController);
 const cartController: CartController = container.resolve<CartController>(CartController);
 const retailProductController: RetailProductController = container.resolve<RetailProductController>(RetailProductController);
 
