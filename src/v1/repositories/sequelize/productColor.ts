@@ -39,6 +39,7 @@ const SequelizeProductColor = teeDB.define<ProductColorInstance, ProductColorAtt
     type: Sequelize.BIGINT
   }
 }, {
+  tableName: 'product_colors',
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });

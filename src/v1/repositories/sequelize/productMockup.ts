@@ -63,6 +63,7 @@ const SequelizeProductMockup = teeDB.define<ProductMockupInstance, ProductMockup
     type: Sequelize.BOOLEAN
   }
 }, {
+  tableName: 'product_mockups',
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });

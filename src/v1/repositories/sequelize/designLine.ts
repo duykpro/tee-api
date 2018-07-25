@@ -30,7 +30,7 @@ interface DesignLineAttributes {
 
 interface DesignLineInstance extends Sequelize.Instance<DesignLineAttributes>, DesignLineAttributes { }
 
-const SequelizeDesignLine = teeDB.define<DesignLineInstance, DesignLineAttributes>('productColor', {
+const SequelizeDesignLine = teeDB.define<DesignLineInstance, DesignLineAttributes>('designLine', {
   id: {
     type: Sequelize.BIGINT,
     autoIncrement: true,
@@ -40,6 +40,7 @@ const SequelizeDesignLine = teeDB.define<DesignLineInstance, DesignLineAttribute
     type: Sequelize.JSON
   }
 }, {
+  tableName: 'design_lines',
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });
@@ -56,7 +57,7 @@ export class SequelizeDesignLineRepository implements DesignLineRepository {
   }
 
   private async instanceToModel(instance: DesignLineInstance): Promise<DesignLine> {
-    const designLine = <DesignLine>{
+    let designLine = <DesignLine>{
       id: instance.id.toString(),
       createdAt: instance.created_at,
       updatedAt: instance.updated_at
@@ -65,12 +66,12 @@ export class SequelizeDesignLineRepository implements DesignLineRepository {
     if (instance.metadata.sides) {
       let sides = {};
 
-      Object.keys(instance.metadata.sides).forEach(key => {
-        const artwork = this.artworkRepository.findById(instance.metadata.sides[key].artwork_id.toString());
+      await Promise.all(Object.keys(instance.metadata.sides).map(async (key) => {
+        const artwork = await this.artworkRepository.findById(instance.metadata.sides[key].artwork_id.toString());
         delete instance.metadata.sides[key].artwork_id;
         sides[key] = instance.metadata.sides[key];
         sides[key].artwork = artwork;
-      });
+      }));
 
       designLine.sides = sides;
     }

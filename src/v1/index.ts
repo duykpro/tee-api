@@ -17,7 +17,7 @@ api.use(express.json());
 api.get('/campaigns', campaignController.index.bind(campaignController));
 api.get('/campaigns/:campaignId', campaignController.show.bind(campaignController));
 
-api.get('/productMockups/:mockupId/:colorId', productMockupController.generate.bind(productMockupController));
+api.get('/productMockups/:mockupId/:colorId/:designLineId', productMockupController.generate.bind(productMockupController));
 
 api.post('/carts', cartController.store.bind(cartController));
 api.get('/carts/:cartId', cartController.show.bind(cartController));

@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { injectable, inject } from 'inversify';
 import sharp, { SharpOptions } from 'sharp';
-import { Storage } from '@google-cloud/storage';
+import Storage from '@google-cloud/storage';
 import { type } from '../constants/serviceIdentifier';
 import { ProductMockupRepository, DesignLineRepository, ProductColorRepository } from '../repositories';
 import { DesignLine } from '../models';
 
-// const storage  = new Storage({
-//   keyFilename: 'key.json',
-// })
-// const bucket = storage.bucket('cloud.printabel.com')
+const storage = Storage({
+  keyFilename: 'key.json',
+});
+const bucket = storage.bucket('cloud.printabel.com');
 
 @injectable()
 export class ProductMockupController {
@@ -25,9 +25,9 @@ export class ProductMockupController {
       const colorId = req.params.colorId;
       const designLineId = req.params.designLineId;
 
-      const mockup = this.productMockupRepository.findById(mockupId);
-      const color = this.productColorRepository.findById(colorId);
-      const designLine = this.designLineRepository.findById(designLineId);
+      const mockup = await this.productMockupRepository.findById(mockupId);
+      const color = await this.productColorRepository.findById(colorId);
+      const designLine = await this.designLineRepository.findById(designLineId);
 
       // console.log(designLineData);
 
@@ -43,31 +43,43 @@ export class ProductMockupController {
       // console.log(82.9616 / 18.4137931034483);
 
 
-      const printable = await sharp(null, {
-        create: {
-          width: mockupData.printable.width,
-          height: mockupData.printable.height,
-          channels: 4,
-          background: '#ff0000'
-        }
-      }).png().toBuffer();
-      const artwork = await sharp('artwork.jpeg').resize(designLineData.dimensions.width, designLineData.dimensions.height).toBuffer();
-      const base = await sharp(null, {
-          create: {
-            width: mockupData.dimensions.width,
-            height: mockupData.dimensions.height,
-            channels: 4,
-            background: '#ffeeff'
-          }
-        }).overlayWith(artwork, {
-          top: designLineData.position.top,
-          left: designLineData.position.left
-        }).png().toBuffer();
-      const ok = await sharp(base).overlayWith(artwork).toBuffer();
+      // const printable = await sharp(null, {
+      //   create: {
+      //     width: mockupData.printable.width,
+      //     height: mockupData.printable.height,
+      //     channels: 4,
+      //     background: '#ff0000'
+      //   }
+      // }).png().toBuffer();
 
-      const output = await sharp(base)
-        .overlayWith('mockup.png')
-        .png()
+
+      let base = await sharp(null, {
+          create: {
+            width: mockup.dimensions.width,
+            height: mockup.dimensions.height,
+            channels: 4,
+            background: color.hex
+          }
+        });
+
+      if (designLine.sides.hasOwnProperty(mockup.side)) {
+        const artwork = await sharp((await bucket.file(designLine.sides[mockup.side].artwork.path).download())[0])
+          .resize(
+            Math.round(designLine.sides[mockup.side].details.widthInch * mockup.ppi),
+            Math.round(designLine.sides[mockup.side].details.heightInch * mockup.ppi)
+          )
+          .ignoreAspectRatio()
+          .toBuffer();
+
+        base = base.overlayWith(artwork, {
+          top: Math.round(designLine.sides[mockup.side].position.y),
+          left: Math.round(designLine.sides[mockup.side].position.x)
+        });
+      }
+
+      const output = await sharp(await base.png().toBuffer())
+        .overlayWith((await bucket.file(mockup.image).download())[0])
+        .jpeg()
         .toBuffer({ resolveWithObject: true })
 
       res.type(`image/${output.info.format}`);

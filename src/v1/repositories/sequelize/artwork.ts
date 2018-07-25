@@ -21,7 +21,7 @@ interface ArtworkAttributes {
 
 interface ArtworkInstance extends Sequelize.Instance<ArtworkAttributes>, ArtworkAttributes { }
 
-const SequelizeArtwork = teeDB.define<ArtworkInstance, ArtworkAttributes>('productColor', {
+const SequelizeArtwork = teeDB.define<ArtworkInstance, ArtworkAttributes>('artwork', {
   id: {
     type: Sequelize.BIGINT,
     autoIncrement: true,

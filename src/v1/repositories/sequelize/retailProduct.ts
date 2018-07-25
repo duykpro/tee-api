@@ -76,7 +76,7 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
         }).map(async (m, i) => {
           return {
             id: m.id.toString(),
-            src: `https://usercontent.amcdn.net/${m.path}`,
+            src: `https://cloud.printabel.com/${m.path}`,
             position: i + 1
           };
         });
