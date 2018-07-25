@@ -41,6 +41,11 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
       id: instance.id.toString(),
       name: instance.name,
       sku: instance.metadata.sku,
+      price: instance.metadata.price,
+      regularPrice: instance.metadata.regular_price,
+      salePrice: instance.metadata.sale_price,
+      weight: instance.metadata.weight,
+      dimensions: instance.metadata.dimensions,
       createdAt: instance.created_at,
       updatedAt: instance.updated_at,
       attributes: instance.attrs

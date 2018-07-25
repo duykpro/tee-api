@@ -13,6 +13,16 @@ export interface RetailProductAttributes {
       id: number;
       featured?: boolean;
     }[];
+    price?: number;
+    regular_price?: number;
+    sale_price?: number;
+    is_virtual?: boolean;
+    weight?: number;
+    dimensions?: {
+      length: number;
+      width: number;
+      height: number;
+    };
   };
   attrs: {
     id: string;
