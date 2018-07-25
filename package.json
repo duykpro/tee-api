@@ -47,8 +47,8 @@
     "@types/sequelize": "^4.27.24",
     "@types/sharp": "^0.17.9",
     "@types/uuid": "^3.4.3",
-    "concurrently": "^3.6.0",
-    "nodemon": "^1.18.2",
+    "concurrently": "^3.6.1",
+    "nodemon": "^1.18.3",
     "tslint": "^5.11.0",
     "typescript": "^2.9.2"
   }
