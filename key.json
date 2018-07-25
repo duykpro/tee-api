@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "printabel-208515",
+  "private_key_id": "de997b0972e3022c7de347f4feccfb91706a51f7",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDB7jbouec98NCg\nYB6gmmPuy2U3cFyQEqxoipiozqbB1lNwdeNSID60bv3zN/Iu/rOESv9HSWXVJhYJ\npJViBebpwfvatWV34Z5UbEH9lItjgzM36cHfrPba/fd2hsYFyZDtelsvnWrNK9U+\n+M3mRcSQNCImsawI2ABwMgFxuKtlkxp9FOzpZx2aH7In56i9X9+tFSVx/RrKzSkr\nfIs6jku85LYhtgUZNPY3ZWCnY2VxrVom9HwpdmK0ToTu8Wf5XPvZhiFW4PNJwbjW\nD4S7p7Zb/yMrFfyuFB4+GaneyUMoO2H/UOc/iFlOmH9y7pUCSGmNoLKMSPH3xOby\n/CbYKf8ZAgMBAAECggEAQJjexWqXMjSy6Zja2thSjUpG7s6IppzxvOjdrO0Y8tw3\ncvBxxftjp6qJAKkUDL9egKSSn+Y8+2DyWkfuUnZw0lCBWfquT95hZPGikZsXSxB6\n0RcWMzFkENIjyeFeuLLJibEGCrg+yRTetVkfDKMUtIwJDCaGjXOVwcmGXaELxotD\nAdCohRyzkPAlQ+HUdfITs9B2zWHH9jXKr+xF+3h8PaKN/KbdQD+DsaJFJFmE4nnH\nYh3B/QK6uI4HliWVtU7e1NBiIECGPz+YUWGXPcgOwOFztj6i/vKywWlhVtis1wav\nKTldxDI3ds72xD8mCkyaIGF+mZVswuqCpeM4hDl6OQKBgQDjQmNqEUQt+warWmWI\np6mQMzFwUmrcO6hREu5v4FLKrI14TMwcBZwG/6tZpS1nVvxMckOJmgJO9i/4zPm+\nojUJyTBxg6MoFWaMDyAhxnqwmpwRf3+j3u3hDyr3mw6+vgibG+xrEh/MaDuatAbn\nPrfFDLcdBdqqd1H1Rkp0EUe7PwKBgQDadMr0aTtX+O4Id7ls/jR5M7aZKwKMtTZs\nkBa0LnY8e6gjgJAzP5aK9kRfikJ0pAG8oG/ijkW2N3YZcNRRbK4Tv1V8+DJ7rL9I\nEOjz7xwJGSw6CcA4nJwTPxEwNa3zGPucagkYyNyIwossViMblPRXJBAJfgiyNpnb\n+ZnpSlfnpwKBgQC215sUo3+vXuAmzTwTjpGmKwoDzMudFYJ+eDTOXjU+S0YnG+K8\nSOcX2mwKXBMDqcCj4OrlsrtYvEosav4kmm0BypTnP3ntrgordZ/sjLv5ius2SNZx\nCdNp18JCJMbgQBS8duLn4lUjKFmMRnunYZaJO4m4GBWuQQH3zO3qJF0KEQKBgQCT\nDZOhO0UrTvJM2OsFJ4mDHQCJ0p4AwetE4SmnWK9Wv5bLbzuig+d+24/jEFrz0YMp\nyoYGZ+cdZfAl6AHEXfhAasfNO/YfsoWAqYFm00p4BW30E6RFd4bIneegIEJcJjEZ\ndXdyK6Pom6y7x7ASXQ6tqiTxftmzvXWM0lR86gKKeQKBgQC2JT34ujR4vCBuWWsG\ngVU19JUHti/UC0HKfeQKETH3k0zHtI2ghrXVM3ZZtQoctT26ZfyDQkNV7lrTcjTt\nZT1ThEm9z88J64Uvn4vuRiUQcgjoTugj1RgXk0FgqaD8xcwzSkGrntu5z9Pg75cB\nOoflp8GgrzrptbUIyHiNgXja2A==\n-----END PRIVATE KEY-----\n",
+  "client_email": "printabel@printabel-208515.iam.gserviceaccount.com",
+  "client_id": "113813938330840925098",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/printabel%40printabel-208515.iam.gserviceaccount.com"
+}
