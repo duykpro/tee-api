@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { v4 } from 'uuid';
-import { pick } from 'lodash';
+import { pick, get } from 'lodash';
 import camelCase from 'camelcase';
 import { CartRepository } from '../cart';
 import { Cart } from '../../models';
@@ -17,11 +17,12 @@ export class SequelizeCartRepository implements CartRepository {
     return cart as Cart;
   }
 
-  public async init(): Promise<Cart> {
-    const cart = this.instanceToModel(await SequelizeCart.create({
+  public async init(data?: Cart): Promise<Cart> {
+    const initData = {
       id: v4().toString(),
-      items: []
-    }));
+      items: get(data, 'items') || []
+    };
+    const cart = this.instanceToModel(await SequelizeCart.create(initData));
 
     return cart;
   }

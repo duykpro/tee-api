@@ -34,7 +34,8 @@ export class CartController {
 
   public async store(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const cart = await this.cart.init();
+      const data = req.body;
+      const cart = await this.cart.init(data);
 
       res.status(200).send(cart);
     } catch (e) {
