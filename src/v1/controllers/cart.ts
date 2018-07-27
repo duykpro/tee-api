@@ -7,13 +7,13 @@ import { APIError } from '../error';
 @injectable()
 export class CartController {
   constructor(
-    @inject(type.CartRepository) private cart: CartRepository
+    @inject(type.CartRepository) private cartRepository: CartRepository
   ) { }
 
   public async show(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const id = req.params.cartId;
-      const cart = await this.cart.findById(id);
+      const cart = await this.cartRepository.findById(id);
 
       if (cart === null) {
         throw new APIError({
@@ -35,7 +35,7 @@ export class CartController {
   public async store(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = req.body;
-      const cart = await this.cart.init(data);
+      const cart = await this.cartRepository.init(data);
 
       res.status(200).send(cart);
     } catch (e) {
@@ -47,7 +47,7 @@ export class CartController {
     try {
       const id = req.params.cartId;
       const data = req.body;
-      let cart = await this.cart.findById(id);
+      let cart = await this.cartRepository.findById(id);
 
       if (cart === null) {
         throw new APIError({
@@ -60,8 +60,7 @@ export class CartController {
         });
       }
 
-      cart.items = data.items;
-      await this.cart.update(cart);
+      cart = await this.cartRepository.update(cart.id, { items: data.items });
       res.status(200).send(cart);
     } catch (e) {
       next(e);

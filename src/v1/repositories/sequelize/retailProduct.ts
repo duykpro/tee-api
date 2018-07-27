@@ -37,6 +37,10 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
   }
 
   private async instanceToModel<T extends RetailProduct | RetailProductVariant>(instance: RetailProductInstance): Promise<T> {
+    if (instance === null) {
+      return null;
+    }
+
     let product = <T>{
       id: instance.id.toString(),
       name: instance.name,

@@ -1,14 +1,11 @@
 import { injectable, inject } from 'inversify';
-import { Op } from 'sequelize';
-import { pick } from 'lodash';
 import { type } from '../../constants/serviceIdentifier';
 import { Campaign, RetailProduct } from '../../models';
 import { CampaignRepository } from '..';
 import { RetailProductRepository } from '../retailProduct';
 import {
   Campaign as SequelizeCampaign,
-  CampaignInstance,
-  RetailProduct as SequelizeRetailProduct
+  CampaignInstance
 } from '../../storage/sequelize/models';
 
 @injectable()
@@ -28,7 +25,11 @@ export class SequelizeCampaignRepository implements CampaignRepository {
   }
 
   private async instanceToModel(instance: CampaignInstance): Promise<Campaign> {
-    const campaign: Campaign = {
+    if (instance === null) {
+      return null;
+    }
+
+    let campaign: Campaign = {
       id: instance.id.toString(),
       title: instance.title,
       description: instance.description,

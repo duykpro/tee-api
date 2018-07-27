@@ -5,7 +5,7 @@ import { Artwork } from '../../models';
 import { ArtworkRepository } from '..';
 
 interface ArtworkAttributes {
-  id: string;
+  id: number;
   path: string;
   metadata: {
     size?: number;
@@ -46,7 +46,11 @@ export class SequelizeArtworkRepository implements ArtworkRepository {
   }
 
   private async instanceToModel(instance: ArtworkInstance): Promise<Artwork> {
-    const artwork: Artwork = {
+    if (instance === null) {
+      return null;
+    }
+
+    let artwork: Artwork = {
       id: instance.id.toString(),
       path: instance.path,
       uploadedAt: instance.uploaded_at,

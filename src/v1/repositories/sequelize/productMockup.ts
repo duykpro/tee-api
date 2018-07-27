@@ -77,6 +77,10 @@ export class SequelizeProductMockupRepository implements ProductMockupRepository
   }
 
   private async instanceToModel(instance: ProductMockupInstance): Promise<ProductMockup> {
+    if (instance === null) {
+      return null;
+    }
+
     const mockup: ProductMockup = {
       id: instance.id.toString(),
       name: instance.name,

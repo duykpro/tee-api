@@ -2,7 +2,6 @@ import { Cart } from '../models';
 
 export interface CartRepository {
   findById(id: string): Promise<Cart>;
-  init(data?: Cart): Promise<Cart>;
-  create(): Promise<Cart>;
-  update(cart: Cart): Promise<boolean>;
+  init(data?: any): Promise<Cart>;
+  update(id: string, data: any): Promise<Cart>;
 }

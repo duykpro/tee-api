@@ -52,7 +52,11 @@ export class SequelizeProductColorRepository implements ProductColorRepository {
   }
 
   private async instanceToModel(instance: ProductColorInstance): Promise<ProductColor> {
-    const color: ProductColor = {
+    if (instance === null) {
+      return null;
+    }
+
+    let color: ProductColor = {
       id: instance.id.toString(),
       name: instance.name,
       hex: instance.hex,

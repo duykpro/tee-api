@@ -5,7 +5,6 @@ type BaseRetailProduct = {
   price?: number;
   regularPrice?: number;
   salePrice?: number;
-  isVirtual?: boolean;
   weight?: number;
   dimensions?: {
     length: number;

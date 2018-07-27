@@ -7,7 +7,7 @@ import { ArtworkRepository } from '../artwork';
 import { type } from '../../constants/serviceIdentifier';
 
 interface DesignLineAttributes {
-  id: string;
+  id: number;
   metadata: {
     sides?: {
       [key: string]: {
@@ -57,6 +57,10 @@ export class SequelizeDesignLineRepository implements DesignLineRepository {
   }
 
   private async instanceToModel(instance: DesignLineInstance): Promise<DesignLine> {
+    if (instance === null) {
+      return null;
+    }
+
     let designLine = <DesignLine>{
       id: instance.id.toString(),
       createdAt: instance.created_at,
