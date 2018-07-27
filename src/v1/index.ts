@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import container from './container';
-import { CampaignController, CartController, RetailProductController, ProductMockupController } from './controllers';
+import { CampaignController, CartController, RetailProductController, ProductMockupController, PaymentController } from './controllers';
 import { APIError } from './error';
 import { NextFunction } from 'express-serve-static-core';
 
@@ -9,6 +9,7 @@ const productMockupController: ProductMockupController = container.resolve<Produ
 const campaignController: CampaignController = container.resolve<CampaignController>(CampaignController);
 const cartController: CartController = container.resolve<CartController>(CartController);
 const retailProductController: RetailProductController = container.resolve<RetailProductController>(RetailProductController);
+const paymentController: PaymentController = container.resolve<PaymentController>(PaymentController);
 
 // Middleware
 api.use(express.json());
@@ -24,6 +25,9 @@ api.get('/carts/:cartId', cartController.show.bind(cartController));
 api.put('/carts/:cartId', cartController.update.bind(cartController));
 
 api.get('/retailProducts/:retailProductId', retailProductController.show.bind(retailProductController));
+
+api.post('/payment/setup', paymentController.setup.bind(paymentController));
+api.post('/payment/process', paymentController.process.bind(paymentController));
 
 // Error handling
 api.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -5,3 +5,4 @@ export * from './campaign';
 export * from './designLine';
 export * from './cart';
 export * from './retailProduct';
+export * from './personInfo';

@@ -3,6 +3,7 @@ import { injectable, inject } from 'inversify';
 import { type } from '../constants/serviceIdentifier';
 import { CartRepository } from '../repositories';
 import { APIError } from '../error';
+import { pick } from 'lodash';
 
 @injectable()
 export class CartController {
@@ -35,7 +36,7 @@ export class CartController {
   public async store(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = req.body;
-      const cart = await this.cartRepository.init(data);
+      const cart = await this.cartRepository.init(pick(data, ['items', 'billing', 'shipping']));
 
       res.status(200).send(cart);
     } catch (e) {
@@ -60,7 +61,7 @@ export class CartController {
         });
       }
 
-      cart = await this.cartRepository.update(cart.id, { items: data.items });
+      cart = await this.cartRepository.update(cart.id, pick(data, ['items', 'billing', 'shipping']));
       res.status(200).send(cart);
     } catch (e) {
       next(e);

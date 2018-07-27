@@ -3,7 +3,7 @@ import { RetailProduct } from '../models';
 export enum Type {
   GroupedProduct = 2,
   VariableProduct = 3,
-  VariantProduct = 4
+  ProductVariation = 4
 }
 
 export interface RetailProductListParams {

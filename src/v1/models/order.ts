@@ -1,13 +1,17 @@
 import { PersonInfo } from './personInfo';
 
-export type Cart = {
+export type Order = {
   id: string;
   orderId: string;
   billing?: PersonInfo;
   shipping?: PersonInfo;
   invoice: CartInvoice;
-  items: CartItem[];
+  items: Order[];
+  customerNote: string;
   paymentMethod: string;
+  transactionId: string;
+  paidAt: Date;
+  completedAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,10 +25,10 @@ export type CartInvoice = {
   total: number;
 }
 
-export type CartItem = {
+export type OrderItem = {
   id: string;
+  name: string;
+  sku: string;
+  price: number;
   quantity: number;
-  meta: {
-    campaignId: string;
-  };
 }

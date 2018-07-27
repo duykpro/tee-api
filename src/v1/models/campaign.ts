@@ -1,4 +1,4 @@
-import { RetailProduct } from "./retailProduct";
+import { RetailProduct } from './retailProduct';
 
 export type Campaign = {
   id: string;

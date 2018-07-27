@@ -91,7 +91,7 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
         });
       product.images = images;
 
-      if (instance.type != Type.VariantProduct) {
+      if (instance.type != Type.ProductVariation) {
         product.images.forEach(i => {
           if (i.id == featured.id.toString()) {
             (<RetailProduct>product).featuredImage = i;
