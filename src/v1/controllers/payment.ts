@@ -87,8 +87,8 @@ export class PaymentController {
           'payment_method': 'paypal'
         },
         redirect_urls: {
-          return_url: 'https://printabel.com',
-          cancel_url: 'https://printabel.com'
+          return_url: `${process.env.FRONTEND_BASE_URL}/payment/successful`,
+          cancel_url: `${process.env.FRONTEND_BASE_URL}/payment/cancelled`
         },
         transactions: [
           {
