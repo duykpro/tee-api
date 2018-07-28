@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { injectable, inject } from 'inversify';
 import { type } from '../constants/serviceIdentifier';
-import { CartRepository, RetailProductRepository } from '../repositories';
-import { Campaign } from '../models/campaign';
-import { ItemResponse, ListItemResponse } from '../responses';
+import { CartRepository, RetailProductRepository, OrderRepository, OrderStatus } from '../repositories';
 import { APIError } from '../error';
 import paypal from 'paypal-rest-sdk';
 import paypalConfig from '../config/paypal';
+import { domain, code, reason, sourceType } from '../constants/error';
+import { Order, OrderItem } from '../models';
 import { keyBy } from 'lodash';
 
 paypal.configure({
@@ -19,21 +19,36 @@ paypal.configure({
 export class PaymentController {
   constructor(
     @inject(type.CartRepository) private cartRepository: CartRepository,
+    @inject(type.OrderRepository) private orderRepository: OrderRepository,
     @inject(type.RetailProductRepository) private retailProductRepository: RetailProductRepository
   ) { }
 
   public async setup(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const cartId = req.body.cartId;
-      const cart = await this.cartRepository.findById(cartId);
+      const billing = req.body.billing;
+      const shipping = req.body.shipping;
+      const paymentMethod = req.body.paymentMethod;
+      let cart = await this.cartRepository.update(cartId, { billing, shipping, paymentMethod });
 
       if (cart === null) {
         throw new APIError({
-          domain: 'tee.cart',
-          code: '404',
-          reason: 'cartNotFound',
-          message: 'The cart identified with the requests cartId parameter cannot be found.',
-          sourceType: 'parameter',
+          domain: domain.Payment,
+          code: code.NotFound,
+          reason: reason.CartNotFound,
+          message: 'Cart not found.',
+          sourceType: sourceType.RequestBody,
+          source: 'cartId'
+        });
+      }
+
+      if (cart.items.length <= 0) {
+        throw new APIError({
+          domain: domain.Payment,
+          code: code.BadRequest,
+          reason: reason.CartIsEmpty,
+          message: 'Cart is empty.',
+          sourceType: sourceType.RequestBody,
           source: 'cartId'
         });
       }
@@ -41,17 +56,30 @@ export class PaymentController {
       const variantIds = cart.items.map(item => item.id);
       const cartItems = await this.retailProductRepository.list({ filter: { ids: variantIds } });
       const quantityMap = keyBy(cart.items, 'id');
-      let items = [];
+      let items: OrderItem[] = [];
       cartItems.forEach(item => {
+        const quantity = quantityMap[item.id].quantity;
+        const subtotal = item.price * quantity;
+
         items.push({
+          id: item.id,
           sku: item.sku,
           name: item.name,
-          description: item.name,
-          quantity: quantityMap[item.id].quantity,
-          price: (item.price / 100).toString(),
-          currency: 'USD'
+          quantity: quantity,
+          price: item.price,
+          subtotal: subtotal,
+          total: subtotal
         });
       });
+
+      let order: Order;
+
+      if (cart.orderId) {
+        order = await this.orderRepository.update(cart.orderId, { items, billing, shipping, paymentMethod, status: OrderStatus.PendingPayment });
+      } else {
+        order = await this.orderRepository.create({ items, billing, shipping, paymentMethod, status: OrderStatus.PendingPayment });
+        cart = await this.cartRepository.update(cartId, { 'orderId': order.id });
+      }
 
       paypal.payment.create({
         intent: 'sale',
@@ -64,28 +92,35 @@ export class PaymentController {
         },
         transactions: [
           {
-            reference_id: cart.id,
+            reference_id: order.id,
             item_list: {
-              items,
-              shipping_address: {
-                line1: '1148  Millbrook Road',
-                line2: '',
-                city: 'HATFIELD',
-                country_code: 'US',
-                postal_code: '01038',
-                state: 'Massachusetts',
-                phone: '(630) 791 0387'
-              },
-              shipping_phone_number: '(202) 456 1111'
+              items: items.map(item => {
+                return {
+                  sku: item.sku,
+                  name: item.name,
+                  price: (item.price / 100).toString(),
+                  currency: 'USD',
+                  quantity: item.quantity
+                };
+              }),
+              // shipping_address: {
+              //   line1: order.shipping.address1,
+              //   line2: order.shipping.address2,
+              //   city: order.shipping.city,
+              //   country_code: order.shipping.country,
+              //   postal_code: order.shipping.postalCode,
+              //   state: order.shipping.state,
+              //   phone: order.shipping.phone
+              // }
             },
             amount: {
               currency: 'USD',
-              total: (cart.invoice.total / 100).toString(),
+              total: (order.total / 100).toString(),
               details: {
-                subtotal: (cart.invoice.subtotal / 100).toString(),
-                shipping: (cart.invoice.shipping / 100).toString(),
-                tax: (cart.invoice.tax / 100).toString(),
-                handling_fee: (cart.invoice.fees / 100).toString()
+                subtotal: (order.details.subtotal / 100).toString(),
+                shipping: (order.details.shipping / 100).toString(),
+                tax: (order.details.tax / 100).toString(),
+                handling_fee: (order.details.fees / 100).toString()
               }
             }
           }
@@ -94,7 +129,12 @@ export class PaymentController {
         if (err !== null) {
           next(err);
         } else {
-          res.status(200).send(payment);
+          res.status(200).send({
+            paypal: {
+              paymentId: payment.id,
+              payment
+            }
+          });
         }
       });
     } catch (e) {
@@ -111,22 +151,31 @@ export class PaymentController {
 
       if (cart === null) {
         throw new APIError({
-          domain: 'tee.cart',
-          code: '404',
-          reason: 'cartNotFound',
-          message: 'The cart identified with the requests cartId parameter cannot be found.',
-          sourceType: 'parameter',
+          domain: domain.Payment,
+          code: code.NotFound,
+          reason: reason.CartNotFound,
+          message: 'Cart not found.',
+          sourceType: sourceType.RequestBody,
           source: 'cartId'
         });
       }
 
       paypal.payment.execute(paymentId, {
         payer_id: payerId
-      }, (err, response) => {
+      }, async (err, response) => {
         if (err !== null) {
           next(err);
         } else {
-          res.status(200).send(response);
+          let order = await this.orderRepository.update(cart.orderId, {
+            paymentMethod: 'paypal',
+            transactionId: response.id,
+            status: OrderStatus.Completed,
+            paidAt: new Date(),
+            completedAt: new Date()
+          });
+          await this.cartRepository.delete(cart.id);
+
+          res.status(200).send(order);
         }
       });
     } catch (e) {

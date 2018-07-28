@@ -7,6 +7,7 @@ import {
   CampaignRepository,
   DesignLineRepository,
   CartRepository,
+  OrderRepository,
   RetailProductRepository,
   SequelizeArtworkRepository,
   SequelizeProductColorRepository,
@@ -14,6 +15,7 @@ import {
   SequelizeCampaignRepository,
   SequelizeDesignLineRepository,
   SequelizeCartRepository,
+  SequelizeOrderRepository,
   SequelizeRetailProductRepository
 } from './repositories';
 
@@ -24,6 +26,7 @@ container.bind<ProductMockupRepository>(type.ProductMockupRepository).to(Sequeli
 container.bind<CampaignRepository>(type.CampaignRepository).to(SequelizeCampaignRepository);
 container.bind<DesignLineRepository>(type.DesignLineRepository).to(SequelizeDesignLineRepository);
 container.bind<CartRepository>(type.CartRepository).to(SequelizeCartRepository);
+container.bind<OrderRepository>(type.OrderRepository).to(SequelizeOrderRepository);
 container.bind<RetailProductRepository>(type.RetailProductRepository).to(SequelizeRetailProductRepository);
 
 export default container;

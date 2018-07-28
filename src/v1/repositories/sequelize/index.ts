@@ -4,4 +4,5 @@ export * from './productColor';
 export * from './productMockup';
 export * from './campaign';
 export * from './cart';
+export * from './order';
 export * from './retailProduct';

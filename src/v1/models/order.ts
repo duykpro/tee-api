@@ -2,27 +2,28 @@ import { PersonInfo } from './personInfo';
 
 export type Order = {
   id: string;
-  orderId: string;
   billing?: PersonInfo;
   shipping?: PersonInfo;
-  invoice: CartInvoice;
-  items: Order[];
+  total: number;
+  details: OrderDetails;
+  items: OrderItem[];
   customerNote: string;
   paymentMethod: string;
   transactionId: string;
+  status: string;
+  isPaid: boolean;
   paidAt: Date;
   completedAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type CartInvoice = {
+export type OrderDetails = {
   discounts: number;
   fees: number;
   shipping: number;
-  subtotal: number;
   tax: number;
-  total: number;
+  subtotal: number;
 }
 
 export type OrderItem = {
@@ -31,4 +32,6 @@ export type OrderItem = {
   sku: string;
   price: number;
   quantity: number;
+  subtotal: number;
+  total: number;
 }

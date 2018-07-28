@@ -5,22 +5,21 @@ import { keyBy, omit, get, values, sum, sumBy, has, isEmpty, forEach, pick } fro
 import camelCase from 'camelcase';
 
 import { type } from '../../constants/serviceIdentifier';
-import { CartRepository, RetailProductRepository } from '..';
+import { OrderRepository, RetailProductRepository } from '..';
 import { storeDB } from '../../storage/sequelize';
-import { Cart, CartInvoice, CartItem, PersonInfo } from '../../models';
+import { Order, OrderDetails, OrderItem, PersonInfo } from '../../models';
 
-interface CartAttributes {
+interface OrderAttributes {
   id: string;
   metadata: {
-    invoice?: {
+    total?: number;
+    details?: {
       discounts: number;
       fees: number;
       shipping: number;
       subtotal: number;
       tax: number;
-      total: number;
     };
-    order_id?: string;
     billing?: {
       first_name: string;
       last_name: string;
@@ -48,23 +47,31 @@ interface CartAttributes {
       phone: string;
     };
     payment_method?: string;
+    transaction_id?: string;
+    customer_note?: string;
   };
   items: {
     id: string;
+    name: string;
+    sku: string;
+    price: number;
     quantity: number;
-    meta: {
-      campaignId: string;
-    };
+    subtotal: number;
+    total: number;
   }[];
+  status: number;
+  paid_at?: Date;
+  completed_at?: Date;
   created_at?: Date;
   updated_at?: Date;
 }
 
-export interface CartInstance extends Sequelize.Instance<CartAttributes>, CartAttributes { }
+export interface OrderInstance extends Sequelize.Instance<OrderAttributes>, OrderAttributes { }
 
-export const SequelizeCart = storeDB.define<CartInstance, CartAttributes>('cart', {
+export const SequelizeOrder = storeDB.define<OrderInstance, OrderAttributes>('order', {
   id: {
-    type: Sequelize.UUIDV4,
+    type: Sequelize.BIGINT,
+    autoIncrement: true,
     primaryKey: true
   },
   metadata: {
@@ -72,6 +79,15 @@ export const SequelizeCart = storeDB.define<CartInstance, CartAttributes>('cart'
   },
   items: {
     type: Sequelize.JSON
+  },
+  status: {
+    type: Sequelize.TINYINT
+  },
+  paid_at: {
+    type: Sequelize.DATE
+  },
+  completed_at: {
+    type: Sequelize.DATE
   }
 }, {
   createdAt: 'created_at',
@@ -79,31 +95,25 @@ export const SequelizeCart = storeDB.define<CartInstance, CartAttributes>('cart'
 });
 
 @injectable()
-export class SequelizeCartRepository implements CartRepository {
+export class SequelizeOrderRepository implements OrderRepository {
 
   constructor(
     @inject(type.RetailProductRepository) private retailProductRepository: RetailProductRepository
   ) { }
 
-  public async findById(id: string): Promise<Cart> {
-    return this.instanceToModel(await SequelizeCart.findById(id));
+  public async findById(id: string): Promise<Order> {
+    return this.instanceToModel(await SequelizeOrder.findById(id));
   }
 
-  public async init(data: any): Promise<Cart> {
+  public async create(data: any): Promise<Order> {
     data = await this.normalizePostData(data);
-    data.id = v4().toString();
+    const order = this.instanceToModel(await SequelizeOrder.create(data));
 
-    if (!has(data, 'items')) {
-      data['items'] = [];
-    }
-
-    const cart = this.instanceToModel(await SequelizeCart.create(data));
-
-    return cart;
+    return order;
   }
 
-  public async update(id: string, data: any): Promise<Cart> {
-    let instance = await SequelizeCart.findById(id);
+  public async update(id: string, data: any): Promise<Order> {
+    let instance = await SequelizeOrder.findById(id);
 
     if (instance === null) {
       return null;
@@ -118,48 +128,42 @@ export class SequelizeCartRepository implements CartRepository {
     return this.instanceToModel(instance);
   }
 
-  public async delete(id: string): Promise<boolean> {
-    let instance = await SequelizeCart.findById(id);
-
-    if (instance === null) {
-      return false;
-    }
-
-    await instance.destroy();
-
-    return true;
-  }
-
-  private async instanceToModel(instance: CartInstance): Promise<Cart> {
+  private async instanceToModel(instance: OrderInstance): Promise<Order> {
     if (instance === null) {
       return null;
     }
 
     let billing: any = {};
 
-    Object.keys(instance.metadata.billing || {}).forEach(key => {
+    Object.keys(get(instance, 'metadata.billing', {})).forEach(key => {
       billing[camelCase(key)] = instance.metadata.billing[key];
     });
 
     let shipping: any = {};
 
-    Object.keys(instance.metadata.shipping || {}).forEach(key => {
+    Object.keys(get(instance, 'metadata.shipping', {})).forEach(key => {
       shipping[camelCase(key)] = instance.metadata.shipping[key];
     });
 
-    let cart = {
+    let order = {
       id: instance.id.toString(),
-      invoice: instance.metadata.invoice,
-      billing: billing,
-      shipping: shipping,
-      orderId: instance.metadata.order_id && instance.metadata.order_id.toString(),
-      paymentMethod: instance.metadata.payment_method,
-      items: instance.items || [],
-      createdAt: instance.created_at,
-      updatedAt: instance.updated_at
+      total: get(instance, 'metadata.total', 0),
+      details: get(instance, 'metadata.details', {}),
+      billing,
+      shipping,
+      items: get(instance, 'items', []),
+      paymentMethod: get(instance, 'metadata.payment_method', null),
+      transactionId: get(instance, 'metadata.transaction_id', null),
+      customerNote: get(instance, 'metadata.customer_note', null),
+      status: get(instance, 'status', null),
+      isPaid: get(instance, 'paid_at') !== null,
+      paidAt: get(instance, 'paid_at', null),
+      completedAt: get(instance, 'completed_at', null),
+      createdAt: get(instance, 'created_at', null),
+      updatedAt: get(instance, 'updated_at', null)
     };
 
-    return cart;
+    return order;
   }
 
   private async normalizePostData(source: any): Promise<any> {
@@ -170,16 +174,33 @@ export class SequelizeCartRepository implements CartRepository {
       data['items'] = get(source, 'items');
     }
 
-    if (has(source, 'orderId')) {
-      data['metadata.order_id'] = get(source, 'orderId');
+    if (has(source, 'status')) {
+      data['status'] = get(source, 'status');
+    }
+
+    if (has(source, 'paidAt')) {
+      data['paid_at'] = get(source, 'paidAt');
+    }
+
+    if (has(source, 'completedAt')) {
+      data['completed_at'] = get(source, 'completedAt');
     }
 
     if (has(source, 'paymentMethod')) {
       data['metadata.payment_method'] = get(source, 'paymentMethod');
     }
 
+    if (has(source, 'transactionId')) {
+      data['metadata.transaction_id'] = get(source, 'transactionId');
+    }
+
+    if (has(source, 'customerNote')) {
+      data['metadata.customer_note'] = get(source, 'customerNote');
+    }
+
     if (data.items) {
-      data['metadata.invoice'] = await this.calculateInvoice(data.items);
+      data['metadata.details'] = await this.calculate(data.items);
+      data['metadata.total'] = data['metadata.details'].subtotal;
     }
 
     const billing = get(source, 'billing');
@@ -197,27 +218,22 @@ export class SequelizeCartRepository implements CartRepository {
     return data;
   }
 
-  private async calculateInvoice(items: CartItem[]): Promise<CartInvoice> {
-    let invoice: CartInvoice = {
+  private async calculate(items: OrderItem[]): Promise<OrderDetails> {
+    let details: OrderDetails = {
       discounts: 0,
       fees: 0,
       shipping: 0,
       subtotal: 0,
-      tax: 0,
-      total: 0
+      tax: 0
     };
 
     if (items.length <= 0) {
-      return invoice;
+      return details;
     }
 
-    const variantIds = items.map(item => item.id);
-    const cartItems = await this.retailProductRepository.list({ filter: { ids: variantIds } });
-    const quantityMap = keyBy(items, 'id');
-    invoice.subtotal = sumBy(cartItems, item => item.price * quantityMap[item.id].quantity);
-    invoice.total = sum(values(omit(invoice, ['total'])));
+    details.subtotal = sumBy(items, item => item.total);
 
-    return invoice;
+    return details;
   }
 
   private normalizePersonInfoFields(source: PersonInfo): any {
