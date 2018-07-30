@@ -4,6 +4,7 @@ import {
   ArtworkRepository,
   ProductColorRepository,
   ProductMockupRepository,
+  TaxonomyRepository,
   CampaignRepository,
   DesignLineRepository,
   CartRepository,
@@ -12,6 +13,7 @@ import {
   SequelizeArtworkRepository,
   SequelizeProductColorRepository,
   SequelizeProductMockupRepository,
+  SequelizeTaxonomyRepository,
   SequelizeCampaignRepository,
   SequelizeDesignLineRepository,
   SequelizeCartRepository,
@@ -23,6 +25,7 @@ let container = new Container();
 container.bind<ArtworkRepository>(type.ArtworkRepository).to(SequelizeArtworkRepository);
 container.bind<ProductColorRepository>(type.ProductColorRepository).to(SequelizeProductColorRepository);
 container.bind<ProductMockupRepository>(type.ProductMockupRepository).to(SequelizeProductMockupRepository);
+container.bind<TaxonomyRepository>(type.TaxonomyRepository).to(SequelizeTaxonomyRepository);
 container.bind<CampaignRepository>(type.CampaignRepository).to(SequelizeCampaignRepository);
 container.bind<DesignLineRepository>(type.DesignLineRepository).to(SequelizeDesignLineRepository);
 container.bind<CartRepository>(type.CartRepository).to(SequelizeCartRepository);

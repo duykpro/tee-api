@@ -28,17 +28,17 @@ export class CampaignController {
 
   public async show(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const id = req.params.campaignId;
-      const campaign = await this.campaign.findById(id);
+      const slug = req.params.campaignSlug;
+      const campaign = await this.campaign.findBySlug(slug);
 
       if (campaign === null) {
         throw new APIError({
           domain: 'tee.cart',
           code: '404',
           reason: 'campaignNotFound',
-          message: 'The campaign identified with the requests campaignId parameter cannot be found.',
+          message: 'The campaign identified with the requests campaignSlug parameter cannot be found.',
           sourceType: 'parameter',
-          source: 'campaignId'
+          source: 'campaignSlug'
         });
       }
 

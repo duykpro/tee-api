@@ -1,5 +1,6 @@
 export const domain = {
-  Payment: 'printabel.payment'
+  Payment: 'printabel.payment',
+  Taxonomy: 'printabel.taxonomy'
 };
 
 export const code = {
@@ -9,7 +10,8 @@ export const code = {
 
 export const reason = {
   CartNotFound: 'cartNotFound',
-  CartIsEmpty: 'cartIsEmpty'
+  CartIsEmpty: 'cartIsEmpty',
+  TaxonomyNotFound: 'taxonomyNotFound'
 };
 
 export const sourceType = {

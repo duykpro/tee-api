@@ -1,12 +1,13 @@
 import { injectable, inject } from 'inversify';
 import { type } from '../../constants/serviceIdentifier';
 import { Campaign, RetailProduct } from '../../models';
-import { CampaignRepository } from '..';
+import { CampaignRepository, CampaignListParams } from '..';
 import { RetailProductRepository } from '../retailProduct';
 import {
   Campaign as SequelizeCampaign,
   CampaignInstance
 } from '../../storage/sequelize/models';
+import { Op } from 'sequelize';
 
 @injectable()
 export class SequelizeCampaignRepository implements CampaignRepository {
@@ -14,14 +15,32 @@ export class SequelizeCampaignRepository implements CampaignRepository {
     @inject(type.RetailProductRepository) private retailProduct: RetailProductRepository
   ) { }
 
-  public async list(): Promise<Campaign[]> {
-    return await SequelizeCampaign.findAll().map(async instance => {
-      return this.instanceToModel(instance);
-    });
+  public async list(params?: CampaignListParams): Promise<Campaign[]> {
+    let where = {};
+
+    if (params) {
+      if (params.filter) {
+        if (params.filter.ids && params.filter.ids.length > 0) {
+          where['id'] = {
+            [Op.in]: params.filter.ids
+          }
+        }
+      }
+    }
+
+    return await SequelizeCampaign.findAll({
+        where: where
+      }).map(async instance => {
+        return this.instanceToModel(instance);
+      });
   }
 
   public async findById(id: string): Promise<Campaign> {
     return this.instanceToModel(await SequelizeCampaign.findById(id));
+  }
+
+  public async findBySlug(slug: string): Promise<Campaign> {
+    return this.instanceToModel(await SequelizeCampaign.find({ where: { slug: slug } }));
   }
 
   private async instanceToModel(instance: CampaignInstance): Promise<Campaign> {

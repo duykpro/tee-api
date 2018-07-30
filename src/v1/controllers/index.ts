@@ -1,3 +1,4 @@
+export * from './taxonomy';
 export * from './campaign';
 export * from './productMockup';
 export * from './cart';
