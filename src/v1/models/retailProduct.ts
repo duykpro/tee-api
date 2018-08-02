@@ -6,6 +6,11 @@ type BaseRetailProduct = {
   regularPrice?: number;
   salePrice?: number;
   weight?: number;
+  metadata?: {
+    [k: string]: {
+      [k: string]: string;
+    };
+  };
   dimensions?: {
     length: number;
     width: number;
@@ -24,6 +29,7 @@ export type RetailProduct = BaseRetailProduct & {
   variants?: RetailProductVariant[];
   attributes?: RetailProductAttribute[];
   featuredImage?: RetailProductImage;
+  related: RetailProduct[];
 }
 
 export enum RetailProductType {

@@ -23,6 +23,10 @@ export interface RetailProductAttributes {
       width: number;
       height: number;
     };
+    related_ids?: number[];
+    printabel?: {
+      [k: string]: string;
+    };
   };
   attrs: {
     id: string;

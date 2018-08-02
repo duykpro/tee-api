@@ -37,6 +37,36 @@ export class SearchController {
         });
       }
 
+      const categories = req.query.categories;
+
+      if (categories && categories.length > 0) {
+        query['bool']['must'].push({
+          terms: {
+            'taxonomies.category.keyword': categories
+          }
+        });
+      }
+
+      const departments = req.query.departments;
+
+      if (departments && departments.length > 0) {
+        query['bool']['must'].push({
+          terms: {
+            'taxonomies.department.keyword': departments
+          }
+        });
+      }
+
+      const productTypes = req.query.productTypes;
+
+      if (productTypes && productTypes.length > 0) {
+        query['bool']['must'].push({
+          terms: {
+            'taxonomies.product_type.keyword': productTypes
+          }
+        });
+      }
+
       if (Object.keys(query).length <= 0) {
         query = undefined;
       }
@@ -94,18 +124,23 @@ export class SearchController {
         }
       });
 
-      const retailProductIds = response.hits.hits.map(value => value._id);
-      const retailProducts = await this.retailProductRepository.list({ filter: { ids: retailProductIds } });
-      const departments = response.aggregations.departments.buckets.map(value => {
+      let retailProducts = [];
+
+      if (response.hits.total > 0) {
+        const retailProductIds = response.hits.hits.map(value => value._id);
+        retailProducts = await this.retailProductRepository.list({ filter: { ids: retailProductIds } });
+      }
+
+      const filterDepartments = response.aggregations.departments.buckets.map(value => {
         return { department: value.key, count: value.doc_count };
       });
-      const productTypes = response.aggregations.productTypes.buckets.map(value => {
+      const filterProductTypes = response.aggregations.productTypes.buckets.map(value => {
         return { productType: value.key, count: value.doc_count };
       });
-      const colors = response.aggregations.colors.buckets.map(value => {
+      const filterColors = response.aggregations.colors.buckets.map(value => {
         return { color: value.key, count: value.doc_count };
       });
-      const priceRanges = response.aggregations.priceRanges.buckets.map(value => {
+      const filterPriceRanges = response.aggregations.priceRanges.buckets.map(value => {
         return {
           name: value.key,
           from: value.from,
@@ -119,10 +154,10 @@ export class SearchController {
         meta: {
           count: response.hits.total,
           filters: {
-            productTypes,
-            departments,
-            colors,
-            priceRanges
+            filterProductTypes,
+            filterDepartments,
+            filterColors,
+            filterPriceRanges
           }
         }
       });

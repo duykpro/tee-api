@@ -52,7 +52,8 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
       dimensions: instance.metadata.dimensions,
       createdAt: instance.created_at,
       updatedAt: instance.updated_at,
-      attributes: instance.attrs
+      attributes: instance.attrs,
+      metadata: instance.metadata
     };
 
     if (instance.type == Type.GroupedProduct && instance.metadata.linked_product_ids) {
@@ -70,6 +71,14 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
           }
         }).map(async i => {
           return this.instanceToModel<RetailProductVariant>(i);
+        });
+
+      (<RetailProduct>product).related = await SequelizeRetailProduct.findAll({
+          where: {
+            parentId: instance.metadata.related_ids
+          }
+        }).map(async i => {
+          return this.instanceToModel<RetailProduct>(i);
         });
     }
 
