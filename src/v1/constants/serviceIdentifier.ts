@@ -1,7 +1,7 @@
 export const type = {
   ArtworkRepository: Symbol.for('ArtworkRepository'),
   ProductColorRepository: Symbol.for('ProductColorRepository'),
-  ProductMockupRepository: Symbol.for('ProductMockupRepository'),
+  ProductTemplateRepository: Symbol.for('ProductTemplateRepository'),
   TaxonomyRepository: Symbol.for('TaxonomyRepository'),
   CampaignRepository: Symbol.for('CampaignRepository'),
   DesignLineRepository: Symbol.for('DesignLineRepository'),

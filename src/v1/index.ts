@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
 import container from './container';
-import { CampaignController, CartController, RetailProductController, ProductMockupController, PaymentController, TaxonomyController, SearchController } from './controllers';
+import { CampaignController, CartController, RetailProductController, ProductTemplateController, PaymentController, TaxonomyController, SearchController } from './controllers';
 import { APIError } from './error';
 import { NextFunction } from 'express-serve-static-core';
 
 const api = express.Router({ mergeParams: true });
-const productMockupController: ProductMockupController = container.resolve<ProductMockupController>(ProductMockupController);
+const productTemplateController: ProductTemplateController = container.resolve<ProductTemplateController>(ProductTemplateController);
 const taxonomyController: TaxonomyController = container.resolve<TaxonomyController>(TaxonomyController);
 const campaignController: CampaignController = container.resolve<CampaignController>(CampaignController);
 const cartController: CartController = container.resolve<CartController>(CartController);
@@ -22,7 +22,7 @@ api.get('/taxonomies/:taxonomySlug/campaigns', taxonomyController.listCampaign.b
 api.get('/campaigns', campaignController.index.bind(campaignController));
 api.get('/campaigns/:campaignSlug', campaignController.show.bind(campaignController));
 
-api.get('/productMockups/:mockupId/:colorId/:designLineId', productMockupController.generate.bind(productMockupController));
+api.get('/generateMockupImage', productTemplateController.generate.bind(productTemplateController));
 
 api.post('/carts', cartController.store.bind(cartController));
 api.get('/carts/:cartId', cartController.show.bind(cartController));

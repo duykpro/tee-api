@@ -9,7 +9,6 @@ interface ProductColorAttributes {
   product_id: number;
   name: string;
   hex: string;
-  sizes: any;
   cost: number;
   created_at: Date;
   updated_at: Date;
@@ -31,9 +30,6 @@ const SequelizeProductColor = teeDB.define<ProductColorInstance, ProductColorAtt
   },
   hex: {
     type: Sequelize.STRING
-  },
-  sizes: {
-    type: Sequelize.JSON
   },
   cost: {
     type: Sequelize.BIGINT
@@ -60,7 +56,6 @@ export class SequelizeProductColorRepository implements ProductColorRepository {
       id: instance.id.toString(),
       name: instance.name,
       hex: instance.hex,
-      sizes: instance.sizes,
       cost: instance.cost,
       createdAt: instance.created_at,
       updatedAt: instance.updated_at

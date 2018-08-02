@@ -13,13 +13,13 @@ export interface CampaignAttributes {
       product_id: number;
       design_line_id: number;
       color_ids: number[];
-      mockup_ids: number[];
+      template_ids: number[];
       price: number;
     }[];
     default: {
       product_id: number;
       color_id: number;
-      mockup_id: number;
+      template_id: number;
     };
     retail_product_id: number;
   };

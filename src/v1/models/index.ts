@@ -1,6 +1,6 @@
 export * from './artwork';
 export * from './productColor';
-export * from './productMockup';
+export * from './productTemplate';
 export * from './taxonomy';
 export * from './campaign';
 export * from './designLine';

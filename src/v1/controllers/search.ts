@@ -5,7 +5,7 @@ import { CampaignRepository } from '../repositories/campaign';
 import { Campaign } from '../models/campaign';
 import { ItemResponse, ListItemResponse } from '../responses';
 import { APIError } from '../error';
-import { TaxonomyRepository } from '../repositories';
+import { TaxonomyRepository, RetailProductRepository } from '../repositories';
 import { domain, code, reason, sourceType } from '../constants/error';
 import { teeDB } from '../storage/sequelize';
 import elasticsearch from '../services/elasticsearch';
@@ -14,18 +14,27 @@ import elasticsearch from '../services/elasticsearch';
 export class SearchController {
   constructor(
     @inject(type.TaxonomyRepository) private taxonomyRepository: TaxonomyRepository,
-    @inject(type.CampaignRepository) private campaignRepository: CampaignRepository
+    @inject(type.CampaignRepository) private campaignRepository: CampaignRepository,
+    @inject(type.RetailProductRepository) private retailProductRepository: RetailProductRepository
   ) { }
 
   public async search(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      let query = {};
+      let query: any = {
+        bool: {
+          must: [
+            { term: { type: '3' } }
+          ]
+        }
+      };
       const q = req.query.q;
 
       if (q) {
-        query['match'] = {
-          name: q
-        }
+        query['bool']['must'].push({
+          match: {
+            name: q
+          }
+        });
       }
 
       if (Object.keys(query).length <= 0) {
@@ -36,17 +45,25 @@ export class SearchController {
       const size = !isNaN(+req.query.limit) ? +req.query.limit : 50;
       const sort = { price: { order: 'asc' } };
       const aggs = {
-        tags : {
-          terms : {
-            field: 'tags',
+        productTypes: {
+          terms: {
+            field: 'taxonomies.product_type.keyword',
             order: {
               _count: 'desc'
             }
           }
         },
-        colors : {
-          terms : {
-            field: 'colors.keyword',
+        departments: {
+          terms: {
+            field: 'taxonomies.department.keyword',
+            order: {
+              _count: 'desc'
+            }
+          }
+        },
+        colors: {
+          terms: {
+            field: 'attributes.Color.keyword',
             order: {
               _count: 'desc'
             }
@@ -77,13 +94,16 @@ export class SearchController {
         }
       });
 
-      const campaignIds = response.hits.hits.map(value => value._id);
-      const campaigns = await this.campaignRepository.list({ filter: { ids: campaignIds } });
+      const retailProductIds = response.hits.hits.map(value => value._id);
+      const retailProducts = await this.retailProductRepository.list({ filter: { ids: retailProductIds } });
+      const departments = response.aggregations.departments.buckets.map(value => {
+        return { department: value.key, count: value.doc_count };
+      });
+      const productTypes = response.aggregations.productTypes.buckets.map(value => {
+        return { productType: value.key, count: value.doc_count };
+      });
       const colors = response.aggregations.colors.buckets.map(value => {
         return { color: value.key, count: value.doc_count };
-      });
-      const tags = response.aggregations.tags.buckets.map(value => {
-        return { tag: value.key, count: value.doc_count };
       });
       const priceRanges = response.aggregations.priceRanges.buckets.map(value => {
         return {
@@ -95,12 +115,13 @@ export class SearchController {
       });
 
       res.status(200).send({
-        data: campaigns,
+        data: retailProducts,
         meta: {
           count: response.hits.total,
           filters: {
+            productTypes,
+            departments,
             colors,
-            tags,
             priceRanges
           }
         }

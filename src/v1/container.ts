@@ -3,7 +3,7 @@ import { type } from './constants/serviceIdentifier';
 import {
   ArtworkRepository,
   ProductColorRepository,
-  ProductMockupRepository,
+  ProductTemplateRepository,
   TaxonomyRepository,
   CampaignRepository,
   DesignLineRepository,
@@ -12,7 +12,7 @@ import {
   RetailProductRepository,
   SequelizeArtworkRepository,
   SequelizeProductColorRepository,
-  SequelizeProductMockupRepository,
+  SequelizeProductTemplateRepository,
   SequelizeTaxonomyRepository,
   SequelizeCampaignRepository,
   SequelizeDesignLineRepository,
@@ -24,7 +24,7 @@ import {
 let container = new Container();
 container.bind<ArtworkRepository>(type.ArtworkRepository).to(SequelizeArtworkRepository);
 container.bind<ProductColorRepository>(type.ProductColorRepository).to(SequelizeProductColorRepository);
-container.bind<ProductMockupRepository>(type.ProductMockupRepository).to(SequelizeProductMockupRepository);
+container.bind<ProductTemplateRepository>(type.ProductTemplateRepository).to(SequelizeProductTemplateRepository);
 container.bind<TaxonomyRepository>(type.TaxonomyRepository).to(SequelizeTaxonomyRepository);
 container.bind<CampaignRepository>(type.CampaignRepository).to(SequelizeCampaignRepository);
 container.bind<DesignLineRepository>(type.DesignLineRepository).to(SequelizeDesignLineRepository);

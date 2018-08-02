@@ -1,10 +1,10 @@
 import { injectable } from 'inversify';
 import Sequelize from 'sequelize';
-import { ProductMockup } from '../../models';
-import { ProductMockupRepository } from '..';
+import { ProductTemplate } from '../../models';
+import { ProductTemplateRepository } from '..';
 import { teeDB } from '../../storage/sequelize';
 
-interface ProductMockupAttributes {
+interface ProductTemplateAttributes {
   id: number;
   product_id: number;
   name: string;
@@ -27,9 +27,9 @@ interface ProductMockupAttributes {
   updated_at: Date;
 }
 
-interface ProductMockupInstance extends Sequelize.Instance<ProductMockupAttributes>, ProductMockupAttributes { }
+interface ProductTemplateInstance extends Sequelize.Instance<ProductTemplateAttributes>, ProductTemplateAttributes { }
 
-const SequelizeProductMockup = teeDB.define<ProductMockupInstance, ProductMockupAttributes>('productMockup', {
+const SequelizeProductTemplate = teeDB.define<ProductTemplateInstance, ProductTemplateAttributes>('productTemplate', {
   id: {
     type: Sequelize.BIGINT,
     autoIncrement: true,
@@ -63,25 +63,25 @@ const SequelizeProductMockup = teeDB.define<ProductMockupInstance, ProductMockup
     type: Sequelize.BOOLEAN
   }
 }, {
-  tableName: 'product_mockups',
+  tableName: 'product_templates',
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });
 
 
 @injectable()
-export class SequelizeProductMockupRepository implements ProductMockupRepository {
+export class SequelizeProductTemplateRepository implements ProductTemplateRepository {
 
-  public async findById(id: string): Promise<ProductMockup> {
-    return this.instanceToModel(await SequelizeProductMockup.findById(id));
+  public async findById(id: string): Promise<ProductTemplate> {
+    return this.instanceToModel(await SequelizeProductTemplate.findById(id));
   }
 
-  private async instanceToModel(instance: ProductMockupInstance): Promise<ProductMockup> {
+  private async instanceToModel(instance: ProductTemplateInstance): Promise<ProductTemplate> {
     if (instance === null) {
       return null;
     }
 
-    const mockup: ProductMockup = {
+    const template: ProductTemplate = {
       id: instance.id.toString(),
       name: instance.name,
       description: instance.description,
@@ -95,6 +95,6 @@ export class SequelizeProductMockupRepository implements ProductMockupRepository
       updatedAt: instance.updated_at
     };
 
-    return mockup;
+    return template;
   }
 }

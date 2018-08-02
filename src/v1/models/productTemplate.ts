@@ -1,4 +1,4 @@
-export type ProductMockup = {
+export type ProductTemplate = {
   id: string;
   name: string;
   description: string;
