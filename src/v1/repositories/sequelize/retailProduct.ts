@@ -28,15 +28,15 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
     return await SequelizeRetailProduct.findAll({
         where: where
       }).map(async instance => {
-        return this.instanceToModel<RetailProduct>(instance);
+        return this.instanceToModel<RetailProduct>(instance, true);
       });
   }
 
   public async findById(id: string): Promise<RetailProduct> {
-    return this.instanceToModel<RetailProduct>(await SequelizeRetailProduct.findById(id));
+    return this.instanceToModel<RetailProduct>(await SequelizeRetailProduct.findById(id), true);
   }
 
-  private async instanceToModel<T extends RetailProduct | RetailProductVariant>(instance: RetailProductInstance): Promise<T> {
+  private async instanceToModel<T extends RetailProduct | RetailProductVariant>(instance: RetailProductInstance, loadRelationship: boolean = false): Promise<T> {
     if (instance === null) {
       return null;
     }
@@ -56,30 +56,34 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
       metadata: instance.metadata
     };
 
-    if (instance.type == Type.GroupedProduct && instance.metadata.linked_product_ids) {
-      const ids = instance.metadata.linked_product_ids.map(id => id.toString());
-      (<RetailProduct>product).linkedProducts = await this.list({ filter: { ids } });
-      (<RetailProduct>product).linkedProducts.sort((a, b) => {
-        return instance.metadata.linked_product_ids.indexOf(+a.id) - instance.metadata.linked_product_ids.indexOf(+b.id);
-      });
-    }
-
-    if (instance.type == Type.VariableProduct) {
-      (<RetailProduct>product).variants = await SequelizeRetailProduct.findAll({
-          where: {
-            parentId: instance.id
-          }
-        }).map(async i => {
-          return this.instanceToModel<RetailProductVariant>(i);
+    if (loadRelationship) {
+      if (instance.type == Type.GroupedProduct && instance.metadata.linked_product_ids) {
+        const ids = instance.metadata.linked_product_ids.map(id => id.toString());
+        (<RetailProduct>product).linkedProducts = await this.list({ filter: { ids } });
+        (<RetailProduct>product).linkedProducts.sort((a, b) => {
+          return instance.metadata.linked_product_ids.indexOf(+a.id) - instance.metadata.linked_product_ids.indexOf(+b.id);
         });
+      }
 
-      (<RetailProduct>product).related = await SequelizeRetailProduct.findAll({
-          where: {
-            parentId: instance.metadata.related_ids
-          }
-        }).map(async i => {
-          return this.instanceToModel<RetailProduct>(i);
-        });
+      if (instance.type == Type.VariableProduct) {
+        (<RetailProduct>product).variants = await SequelizeRetailProduct.findAll({
+            where: {
+              parentId: instance.id
+            }
+          }).map(async i => {
+            return this.instanceToModel<RetailProductVariant>(i);
+          });
+
+        (<RetailProduct>product).related = await SequelizeRetailProduct.findAll({
+            where: {
+              id: {
+                [Op.in]: instance.metadata.related_ids
+              }
+            }
+          }).map(async i => {
+            return this.instanceToModel<RetailProduct>(i);
+          });
+      }
     }
 
     if (instance.metadata.images) {
