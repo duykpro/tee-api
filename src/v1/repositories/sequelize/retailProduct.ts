@@ -73,17 +73,17 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
           }).map(async i => {
             return this.instanceToModel<RetailProductVariant>(i);
           });
-
-        (<RetailProduct>product).related = await SequelizeRetailProduct.findAll({
-            where: {
-              id: {
-                [Op.in]: instance.metadata.related_ids
-              }
-            }
-          }).map(async i => {
-            return this.instanceToModel<RetailProduct>(i);
-          });
       }
+
+      (<RetailProduct>product).related = await SequelizeRetailProduct.findAll({
+          where: {
+            id: {
+              [Op.in]: instance.metadata.related_ids
+            }
+          }
+        }).map(async i => {
+          return this.instanceToModel<RetailProduct>(i);
+        });
     }
 
     if (instance.metadata.images) {
