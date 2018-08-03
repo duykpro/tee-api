@@ -21,7 +21,7 @@ export interface CampaignAttributes {
       color_id: number;
       template_id: number;
     };
-    retail_product_id: number;
+    retail_product_ids: number[];
   };
   status: number;
   created_at: Date;

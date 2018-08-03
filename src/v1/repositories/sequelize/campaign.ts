@@ -54,7 +54,7 @@ export class SequelizeCampaignRepository implements CampaignRepository {
       description: instance.description,
       slug: instance.slug,
       duration: instance.metadata.duration,
-      retailProduct: await this.retailProduct.findById(''+instance.metadata.retail_product_id),
+      retailProducts: await this.retailProduct.list({ filter: { ids: instance.metadata.retail_product_ids.map(id => id.toString()) } }),
       createdAt: instance.created_at,
       updatedAt: instance.updated_at
     };
