@@ -86,8 +86,6 @@ export class SequelizeCampaignRepository implements CampaignRepository {
       mapProduct.push(n);
     });
 
-    console.log(retailProducts2);
-
     let retailProduct: RetailProduct = {
       id: instance.id.toString(),
       name: instance.title,
