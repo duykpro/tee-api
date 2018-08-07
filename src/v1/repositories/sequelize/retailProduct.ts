@@ -53,7 +53,7 @@ export class SequelizeRetailProductRepository implements RetailProductRepository
       createdAt: instance.created_at,
       updatedAt: instance.updated_at,
       attributes: instance.attrs,
-      metadata: instance.metadata
+      metadata: instance.custom_metadata
     };
 
     if (loadRelationship) {

@@ -24,9 +24,6 @@ export interface RetailProductAttributes {
       height: number;
     };
     related_ids?: number[];
-    printabel?: {
-      [k: string]: string;
-    };
   };
   attrs: {
     id: string;
@@ -42,6 +39,11 @@ export interface RetailProductAttributes {
     id: string;
     value: string;
   }[];
+  custom_metadata?: {
+    [k: string]: {
+      [k: string]: string;
+    };
+  };
   type: number;
   status: number;
   created_at: Date;
@@ -134,6 +136,9 @@ export const RetailProduct = storeDB.define<RetailProductInstance, RetailProduct
   attrs: {
     type: Sequelize.JSON,
     field: 'attributes'
+  },
+  custom_metadata: {
+    type: Sequelize.JSON
   },
   type: {
     type: Sequelize.TINYINT
