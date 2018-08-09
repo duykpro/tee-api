@@ -6,7 +6,7 @@ import { Campaign } from '../models/campaign';
 import { ItemResponse, ListItemResponse } from '../responses';
 import { APIError } from '../error';
 import { TaxonomyRepository } from '../repositories';
-import { domain, code, reason, sourceType } from '../constants/error';
+import { Domain, Code, Reason, SourceType } from '../constants/error';
 import { teeDB } from '../storage/sequelize';
 
 @injectable()
@@ -23,11 +23,11 @@ export class TaxonomyController {
 
       if (taxonomy === null) {
         throw new APIError({
-          domain: domain.Taxonomy,
-          code: code.NotFound,
-          reason: reason.TaxonomyNotFound,
+          domain: Domain.Taxonomy,
+          code: Code.NotFound,
+          reason: Reason.TaxonomyNotFound,
           message: 'Cart not found.',
-          sourceType: sourceType.Parameter,
+          sourceType: SourceType.Parameter,
           source: 'cartId'
         });
       }

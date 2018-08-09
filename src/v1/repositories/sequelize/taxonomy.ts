@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import Sequelize from 'sequelize';
-import { teeDB } from '../../storage/sequelize';
+import { storeDB } from '../../storage/sequelize';
 import { Taxonomy } from '../../models';
 import { TaxonomyRepository } from '..';
 
@@ -15,7 +15,7 @@ interface TaxonomyAttributes {
 
 interface TaxonomyInstance extends Sequelize.Instance<TaxonomyAttributes>, TaxonomyAttributes { }
 
-const SequelizeTaxonomy = teeDB.define<TaxonomyInstance, TaxonomyAttributes>('taxonomy', {
+const SequelizeTaxonomy = storeDB.define<TaxonomyInstance, TaxonomyAttributes>('taxonomy', {
   id: {
     type: Sequelize.BIGINT,
     autoIncrement: true,

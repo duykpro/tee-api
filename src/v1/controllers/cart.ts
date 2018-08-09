@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { injectable, inject } from 'inversify';
+import { pick } from 'lodash';
+
 import { type } from '../constants/serviceIdentifier';
+import { Domain, Code, Reason, SourceType } from '../constants/error';
 import { CartRepository } from '../repositories';
 import { APIError } from '../error';
-import { pick } from 'lodash';
 
 @injectable()
 export class CartController {
@@ -18,11 +20,11 @@ export class CartController {
 
       if (cart === null) {
         throw new APIError({
-          domain: 'tee.cart',
-          code: '404',
-          reason: 'cartNotFound',
+          domain: Domain.Cart,
+          code: Code.NotFound,
+          reason: Reason.CartNotFound,
           message: 'The cart identified with the requests cartId parameter cannot be found.',
-          sourceType: 'parameter',
+          sourceType: SourceType.Parameter,
           source: 'cartId'
         });
       }
@@ -52,11 +54,11 @@ export class CartController {
 
       if (cart === null) {
         throw new APIError({
-          domain: 'tee.cart',
-          code: '404',
-          reason: 'cartNotFound',
+          domain: Domain.Cart,
+          code: Code.NotFound,
+          reason: Reason.CartNotFound,
           message: 'The cart identified with the requests cartId parameter cannot be found.',
-          sourceType: 'parameter',
+          sourceType: SourceType.Parameter,
           source: 'cartId'
         });
       }

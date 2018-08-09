@@ -1,20 +1,25 @@
-export const domain = {
-  Payment: 'printabel.payment',
-  Taxonomy: 'printabel.taxonomy'
+export enum Domain {
+  Campaign = 'printabel.campaign',
+  RetailProduct = 'printabel.retailProduct',
+  Cart = 'printabel.cart',
+  Payment = 'printabel.payment',
+  Taxonomy = 'printabel.taxonomy'
 };
 
-export const code = {
-  BadRequest: '400',
-  NotFound: '404'
+export enum Code {
+  BadRequest = '400',
+  NotFound = '404'
 };
 
-export const reason = {
-  CartNotFound: 'cartNotFound',
-  CartIsEmpty: 'cartIsEmpty',
-  TaxonomyNotFound: 'taxonomyNotFound'
+export enum Reason {
+  CampaignNotFound = 'campaignNotFound',
+  RetailProductNotFound = 'retailProductNotFound',
+  CartNotFound = 'cartNotFound',
+  CartIsEmpty = 'cartIsEmpty',
+  TaxonomyNotFound = 'taxonomyNotFound'
 };
 
-export const sourceType = {
-  Parameter: 'parameter',
-  RequestBody: 'requestBody'
-}
+export enum SourceType {
+  Parameter = 'parameter',
+  RequestBody = 'requestBody'
+};

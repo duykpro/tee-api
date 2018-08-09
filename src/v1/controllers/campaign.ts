@@ -5,6 +5,7 @@ import { CampaignRepository } from '../repositories/campaign';
 import { Campaign } from '../models/campaign';
 import { ItemResponse, ListItemResponse } from '../responses';
 import { APIError } from '../error';
+import { Domain, Code, Reason, SourceType } from '../constants/error';
 
 @injectable()
 export class CampaignController {
@@ -33,11 +34,11 @@ export class CampaignController {
 
       if (campaign === null) {
         throw new APIError({
-          domain: 'tee.cart',
-          code: '404',
-          reason: 'campaignNotFound',
+          domain: Domain.Campaign,
+          code: Code.NotFound,
+          reason: Reason.CampaignNotFound,
           message: 'The campaign identified with the requests campaignSlug parameter cannot be found.',
-          sourceType: 'parameter',
+          sourceType: SourceType.Parameter,
           source: 'campaignSlug'
         });
       }

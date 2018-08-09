@@ -1,11 +1,12 @@
 import { ErrorResponse } from "./responses";
+import { Domain, Code, Reason, SourceType } from './constants/error';
 
 export interface ErrorObject {
-  domain: string;
-  code: string;
-  reason: string;
+  domain: Domain;
+  code: Code;
+  reason: Reason;
   message: string;
-  sourceType: string;
+  sourceType: SourceType;
   source: string;
 }
 

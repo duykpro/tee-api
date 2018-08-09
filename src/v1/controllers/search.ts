@@ -6,7 +6,6 @@ import { Campaign } from '../models/campaign';
 import { ItemResponse, ListItemResponse } from '../responses';
 import { APIError } from '../error';
 import { TaxonomyRepository, RetailProductRepository } from '../repositories';
-import { domain, code, reason, sourceType } from '../constants/error';
 import { teeDB } from '../storage/sequelize';
 import elasticsearch from '../services/elasticsearch';
 

@@ -3,6 +3,7 @@ import { injectable, inject } from 'inversify';
 import { type } from '../constants/serviceIdentifier';
 import { RetailProductRepository } from '../repositories';
 import { APIError } from '../error';
+import { Domain, Code, Reason, SourceType } from '../constants/error';
 
 @injectable()
 export class RetailProductController {
@@ -17,11 +18,11 @@ export class RetailProductController {
 
       if (cart === null) {
         throw new APIError({
-          domain: 'tee.cart',
-          code: '404',
-          reason: 'retailProductNotFound',
+          domain: Domain.RetailProduct,
+          code: Code.NotFound,
+          reason: Reason.RetailProductNotFound,
           message: 'The retail product identified with the requests retailProductId parameter cannot be found.',
-          sourceType: 'parameter',
+          sourceType: SourceType.Parameter,
           source: 'retailProductId'
         });
       }

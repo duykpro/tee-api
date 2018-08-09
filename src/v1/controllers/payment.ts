@@ -4,8 +4,8 @@ import { type } from '../constants/serviceIdentifier';
 import { CartRepository, RetailProductRepository, OrderRepository, OrderStatus } from '../repositories';
 import { APIError } from '../error';
 import paypal from 'paypal-rest-sdk';
-import paypalConfig from '../config/paypal';
-import { domain, code, reason, sourceType } from '../constants/error';
+import { paypal as paypalConfig } from '../config/payment';
+import { Domain, Code, Reason, SourceType } from '../constants/error';
 import { Order, OrderItem } from '../models';
 import { keyBy } from 'lodash';
 
@@ -33,22 +33,22 @@ export class PaymentController {
 
       if (cart === null) {
         throw new APIError({
-          domain: domain.Payment,
-          code: code.NotFound,
-          reason: reason.CartNotFound,
+          domain: Domain.Payment,
+          code: Code.NotFound,
+          reason: Reason.CartNotFound,
           message: 'Cart not found.',
-          sourceType: sourceType.RequestBody,
+          sourceType: SourceType.RequestBody,
           source: 'cartId'
         });
       }
 
       if (cart.items.length <= 0) {
         throw new APIError({
-          domain: domain.Payment,
-          code: code.BadRequest,
-          reason: reason.CartIsEmpty,
+          domain: Domain.Payment,
+          code: Code.BadRequest,
+          reason: Reason.CartIsEmpty,
           message: 'Cart is empty.',
-          sourceType: sourceType.RequestBody,
+          sourceType: SourceType.RequestBody,
           source: 'cartId'
         });
       }
@@ -151,11 +151,11 @@ export class PaymentController {
 
       if (cart === null) {
         throw new APIError({
-          domain: domain.Payment,
-          code: code.NotFound,
-          reason: reason.CartNotFound,
+          domain: Domain.Payment,
+          code: Code.NotFound,
+          reason: Reason.CartNotFound,
           message: 'Cart not found.',
-          sourceType: sourceType.RequestBody,
+          sourceType: SourceType.RequestBody,
           source: 'cartId'
         });
       }

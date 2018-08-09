@@ -3,6 +3,7 @@ import container from './container';
 import { CampaignController, CartController, RetailProductController, ProductTemplateController, PaymentController, TaxonomyController, SearchController } from './controllers';
 import { APIError } from './error';
 import { NextFunction } from 'express-serve-static-core';
+import { ShowCampaignRequest } from './requests/showCampaign';
 
 const api = express.Router({ mergeParams: true });
 const productTemplateController: ProductTemplateController = container.resolve<ProductTemplateController>(ProductTemplateController);
@@ -12,15 +13,20 @@ const cartController: CartController = container.resolve<CartController>(CartCon
 const retailProductController: RetailProductController = container.resolve<RetailProductController>(RetailProductController);
 const paymentController: PaymentController = container.resolve<PaymentController>(PaymentController);
 const searchController: SearchController = container.resolve<SearchController>(SearchController);
+// const showCampaignRequest: ShowCampaignRequest = container.resolve<ShowCampaignRequest>(ShowCampaignRequest);
 
 // Middleware
 api.use(express.json());
+api.use(express.urlencoded({ extended: true }));
 
 // Routes
 api.get('/taxonomies/:taxonomySlug/campaigns', taxonomyController.listCampaign.bind(taxonomyController));
 
 api.get('/campaigns', campaignController.index.bind(campaignController));
-api.get('/campaigns/:campaignSlug', campaignController.show.bind(campaignController));
+api.get(
+  '/campaigns/:campaignSlug',
+  campaignController.show.bind(campaignController)
+);
 
 api.get('/generateMockupImage', productTemplateController.generate.bind(productTemplateController));
 
