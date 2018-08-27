@@ -3,8 +3,7 @@ import { injectable, inject } from 'inversify';
 import { type } from '../constants/serviceIdentifier';
 import { CampaignRepository } from '../repositories/campaign';
 import { Campaign } from '../models/campaign';
-import { ItemResponse, ListItemResponse } from '../responses';
-import { APIError } from '../error';
+import { ItemResponse, ListItemResponse, ErrorResponse } from '../responses';
 import { TaxonomyRepository } from '../repositories';
 import { Domain, Code, Reason, SourceType } from '../constants/error';
 import { teeDB } from '../storage/sequelize';
@@ -22,7 +21,7 @@ export class TaxonomyController {
       const taxonomy = await this.taxonomyRepository.findBySlug(slug);
 
       if (taxonomy === null) {
-        throw new APIError({
+        throw new ErrorResponse({
           domain: Domain.Taxonomy,
           code: Code.NotFound,
           reason: Reason.TaxonomyNotFound,

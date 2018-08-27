@@ -68,7 +68,6 @@ const SequelizeProductTemplate = teeDB.define<ProductTemplateInstance, ProductTe
   updatedAt: 'updated_at'
 });
 
-
 @injectable()
 export class SequelizeProductTemplateRepository implements ProductTemplateRepository {
 

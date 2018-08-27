@@ -6,7 +6,7 @@ export type Campaign = {
   description: string;
   slug: string;
   duration: Number;
-  retailProducts: RetailProduct[];
+  retailProductIds: string[];
   createdAt: Date;
   updatedAt: Date;
 }

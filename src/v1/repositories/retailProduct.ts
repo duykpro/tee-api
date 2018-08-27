@@ -1,9 +1,13 @@
 import { RetailProduct } from '../models';
 
-export enum Type {
-  GroupedProduct = 2,
-  VariableProduct = 3,
-  ProductVariation = 4
+export enum RetailProductType {
+  SingleProduct = 1,
+  VariableProduct,
+  ProductVariation
+}
+
+export enum RetailProductStatus {
+  Published = 1
 }
 
 export interface RetailProductListParams {

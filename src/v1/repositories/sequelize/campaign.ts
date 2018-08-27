@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { type } from '../../constants/serviceIdentifier';
-import { Campaign, RetailProduct } from '../../models';
+import { Campaign } from '../../models';
 import { CampaignRepository, CampaignListParams } from '..';
 import { RetailProductRepository } from '../retailProduct';
 import {
@@ -8,7 +8,6 @@ import {
   CampaignInstance
 } from '../../storage/sequelize/models';
 import { Op } from 'sequelize';
-import { groupBy, flatten } from 'lodash';
 
 @injectable()
 export class SequelizeCampaignRepository implements CampaignRepository {
@@ -49,15 +48,13 @@ export class SequelizeCampaignRepository implements CampaignRepository {
       return null;
     }
 
-    const retailProducts = await this.retailProduct.list({ filter: { ids: instance.metadata.retail_product_ids.map(id => id.toString()) } });
-
     let campaign: Campaign = {
       id: instance.id.toString(),
       title: instance.title,
       description: instance.description,
       slug: instance.slug,
       duration: instance.metadata.duration,
-      retailProducts: retailProducts,
+      retailProductIds: instance.metadata.retail_product_ids.map(id => id.toString()),
       createdAt: instance.created_at,
       updatedAt: instance.updated_at
     };

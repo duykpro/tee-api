@@ -6,64 +6,56 @@ type BaseRetailProduct = {
   regularPrice?: number;
   salePrice?: number;
   weight?: number;
-  metadata?: {
-    [k: string]: {
-      [k: string]: string;
-    };
-  };
   dimensions?: {
     length: number;
     width: number;
     height: number;
   };
-  images?: RetailProductImage[];
+  metadata?: {
+    [k: string]: {
+      [k: string]: string;
+    };
+  };
   createdAt: Date;
   updatedAt: Date;
 }
 
 export type RetailProduct = BaseRetailProduct & {
   description?: string;
+  attributes?: RetailProductAttribute[];
+  variants?: RetailProductVariant[];
+  images?: RetailProductImage[];
+  featuredImage?: RetailProductImage;
+  linkedIds?: string[];
+  relatedIds?: string[];
   type?: RetailProductType;
   status?: RetailProductStatus;
-  linkedProducts?: RetailProduct[];
-  variants?: RetailProductVariant[];
-  attributes?: RetailProductAttribute[];
-  featuredImage?: RetailProductImage;
-  related: RetailProduct[];
-}
-
-export enum RetailProductType {
-  Variable = 'variable',
-}
-
-export enum RetailProductStatus {
-  Publish = 'publish',
-}
-
-export interface RetailProductVariant extends BaseRetailProduct {
-  attributes: RetailProductVariantAttribute[];
 }
 
 export interface RetailProductAttribute {
   id: string;
   name: string;
-  type: string;
   default: string;
-  options: {
-    cost?: number;
-    label?: string;
-    value?: string;
-  }[];
-}
-
-export interface RetailProductVariantAttribute {
-  id: string;
-  value: string;
+  options: string[];
+  position: number;
 }
 
 export interface RetailProductImage {
   id: string;
   src: string;
   position: number;
+  metadata?: {
+    [k: string]: {
+      [k: string]: string;
+    };
+  };
   variantIds?: string[];
+}
+
+export type RetailProductType = 'single' | 'variable';
+
+export type RetailProductStatus = 'published';
+
+export type RetailProductVariant = BaseRetailProduct & {
+  attributes: string[];
 }

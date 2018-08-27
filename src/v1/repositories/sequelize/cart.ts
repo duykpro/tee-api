@@ -92,6 +92,7 @@ export class SequelizeCartRepository implements CartRepository {
   public async init(data: any): Promise<Cart> {
     data = await this.normalizePostData(data);
     data.id = v4().toString();
+    data.metadata = {};
 
     if (!has(data, 'items')) {
       data['items'] = [];
@@ -136,16 +137,17 @@ export class SequelizeCartRepository implements CartRepository {
     }
 
     let billing: any = {};
-
-    Object.keys(instance.metadata.billing || {}).forEach(key => {
-      billing[camelCase(key)] = instance.metadata.billing[key];
-    });
-
     let shipping: any = {};
 
-    Object.keys(instance.metadata.shipping || {}).forEach(key => {
-      shipping[camelCase(key)] = instance.metadata.shipping[key];
-    });
+    if (instance.metadata) {
+      Object.keys(instance.metadata.billing || {}).forEach(key => {
+        billing[camelCase(key)] = instance.metadata.billing[key];
+      });
+
+      Object.keys(instance.metadata.shipping || {}).forEach(key => {
+        shipping[camelCase(key)] = instance.metadata.shipping[key];
+      });
+    }
 
     let cart = {
       id: instance.id.toString(),
@@ -158,6 +160,16 @@ export class SequelizeCartRepository implements CartRepository {
       createdAt: instance.created_at,
       updatedAt: instance.updated_at
     };
+
+    const variantIds = instance.items.map(item => item.id);
+
+    if (variantIds.length > 0) {
+      const cartItems = await this.retailProductRepository.list({ filter: { ids: variantIds } });
+      const itemMap = keyBy(instance.items, 'id');
+      cart.items = cartItems.map(item => {
+        return Object.assign(itemMap[item.id], { product: item });
+      });
+    }
 
     return cart;
   }

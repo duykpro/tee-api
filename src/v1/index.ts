@@ -1,8 +1,15 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
+
 import container from './container';
-import { CampaignController, CartController, RetailProductController, ProductTemplateController, PaymentController, TaxonomyController, SearchController } from './controllers';
-import { APIError } from './error';
-import { NextFunction } from 'express-serve-static-core';
+import {
+  CampaignController,
+  CartController,
+  RetailProductController,
+  ProductTemplateController,
+  PaymentController,
+  TaxonomyController
+} from './controllers';
+import { ErrorResponse } from './responses';
 import { ShowCampaignRequest } from './requests/showCampaign';
 
 const api = express.Router({ mergeParams: true });
@@ -12,7 +19,6 @@ const campaignController: CampaignController = container.resolve<CampaignControl
 const cartController: CartController = container.resolve<CartController>(CartController);
 const retailProductController: RetailProductController = container.resolve<RetailProductController>(RetailProductController);
 const paymentController: PaymentController = container.resolve<PaymentController>(PaymentController);
-const searchController: SearchController = container.resolve<SearchController>(SearchController);
 // const showCampaignRequest: ShowCampaignRequest = container.resolve<ShowCampaignRequest>(ShowCampaignRequest);
 
 // Middleware
@@ -22,7 +28,11 @@ api.use(express.urlencoded({ extended: true }));
 // Routes
 api.get('/taxonomies/:taxonomySlug/campaigns', taxonomyController.listCampaign.bind(taxonomyController));
 
-api.get('/campaigns', campaignController.index.bind(campaignController));
+// Campaign route
+api.get(
+  '/campaigns',
+  campaignController.list.bind(campaignController)
+);
 api.get(
   '/campaigns/:campaignSlug',
   campaignController.show.bind(campaignController)
@@ -33,17 +43,24 @@ api.get('/generateMockupImage', productTemplateController.generate.bind(productT
 api.post('/carts', cartController.store.bind(cartController));
 api.get('/carts/:cartId', cartController.show.bind(cartController));
 api.put('/carts/:cartId', cartController.update.bind(cartController));
+api.post('/carts/:cartId', cartController.addToCart.bind(cartController));
 
-api.get('/retailProducts/:retailProductId', retailProductController.show.bind(retailProductController));
+// Retail product route
+api.get(
+  '/retailProducts',
+  retailProductController.list.bind(retailProductController)
+);
+api.get(
+  '/retailProducts/:retailProductId',
+  retailProductController.show.bind(retailProductController)
+);
 
 api.post('/payment/setup', paymentController.setup.bind(paymentController));
 api.post('/payment/process', paymentController.process.bind(paymentController));
 
-api.get('/search', searchController.search.bind(searchController));
-
 // Error handling
 api.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (err instanceof APIError) {
+  if (err instanceof ErrorResponse) {
     res.status(err.getHTTPStatus()).send(err.getResponse());
     return;
   }

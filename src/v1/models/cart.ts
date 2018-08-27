@@ -24,7 +24,7 @@ export type CartInvoice = {
 export type CartItem = {
   id: string;
   quantity: number;
-  meta: {
+  meta?: {
     campaignId: string;
   };
 }

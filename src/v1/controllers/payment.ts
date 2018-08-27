@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { injectable, inject } from 'inversify';
 import { type } from '../constants/serviceIdentifier';
 import { CartRepository, RetailProductRepository, OrderRepository, OrderStatus } from '../repositories';
-import { APIError } from '../error';
+import { ItemResponse, ListItemResponse, ErrorResponse } from '../responses';
 import paypal from 'paypal-rest-sdk';
 import { paypal as paypalConfig } from '../config/payment';
 import { Domain, Code, Reason, SourceType } from '../constants/error';
@@ -32,7 +32,7 @@ export class PaymentController {
       let cart = await this.cartRepository.update(cartId, { billing, shipping, paymentMethod });
 
       if (cart === null) {
-        throw new APIError({
+        throw new ErrorResponse({
           domain: Domain.Payment,
           code: Code.NotFound,
           reason: Reason.CartNotFound,
@@ -43,7 +43,7 @@ export class PaymentController {
       }
 
       if (cart.items.length <= 0) {
-        throw new APIError({
+        throw new ErrorResponse({
           domain: Domain.Payment,
           code: Code.BadRequest,
           reason: Reason.CartIsEmpty,
@@ -150,7 +150,7 @@ export class PaymentController {
       const cart = await this.cartRepository.findById(cartId);
 
       if (cart === null) {
-        throw new APIError({
+        throw new ErrorResponse({
           domain: Domain.Payment,
           code: Code.NotFound,
           reason: Reason.CartNotFound,

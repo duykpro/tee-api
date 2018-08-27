@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { injectable, inject } from 'inversify';
+
 import { type } from '../constants/serviceIdentifier';
-import { CampaignRepository } from '../repositories/campaign';
-import { Campaign } from '../models/campaign';
-import { ItemResponse, ListItemResponse } from '../responses';
-import { APIError } from '../error';
+import { Kind } from '../constants/response';
 import { Domain, Code, Reason, SourceType } from '../constants/error';
+import { Campaign } from '../models';
+import { CampaignRepository, CampaignListParams } from '../repositories';
+import { ItemResponse, ListItemResponse, ErrorResponse } from '../responses';
 
 @injectable()
 export class CampaignController {
@@ -13,13 +14,25 @@ export class CampaignController {
     @inject(type.CampaignRepository) private campaign: CampaignRepository
   ) { }
 
-  public async index(req: Request, res: Response, next: NextFunction): Promise<void> {
+  public async list(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const campaigns: Campaign[] = await this.campaign.list();
-      const response: ListItemResponse = {
-        id: 'campaigns',
-        data: campaigns
-      };
+      // Params
+      let params: CampaignListParams = { filter: {} };
+      let ids = req.query.ids;
+
+      if (typeof ids === 'string') {
+        ids = ids.split(',');
+      }
+
+      if (ids) {
+        params.filter.ids = ids;
+      }
+
+      // Data
+      const campaigns: Campaign[] = await this.campaign.list(params);
+      const response = new ListItemResponse<Campaign>(
+        'campaigns', Kind.Campaign, campaigns
+      );
 
       res.status(200).send(response);
     } catch (e) {
@@ -33,7 +46,7 @@ export class CampaignController {
       const campaign = await this.campaign.findBySlug(slug);
 
       if (campaign === null) {
-        throw new APIError({
+        throw new ErrorResponse({
           domain: Domain.Campaign,
           code: Code.NotFound,
           reason: Reason.CampaignNotFound,
@@ -43,7 +56,9 @@ export class CampaignController {
         });
       }
 
-      res.status(200).send(campaign);
+      const response = new ItemResponse<Campaign>(Kind.Campaign, campaign);
+
+      res.status(200).send(response);
     } catch (e) {
       next(e);
     }
