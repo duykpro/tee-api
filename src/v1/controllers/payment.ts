@@ -132,7 +132,7 @@ export class PaymentController {
           res.status(200).send({
             paypal: {
               paymentId: payment.id,
-              payment
+              approvalUrl: payment.links.find(link => link.rel == 'approval_url').href
             }
           });
         }
